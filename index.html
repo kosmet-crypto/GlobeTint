@@ -19,12 +19,20 @@
   color-scheme:light;
 }
 :root[data-palette="rose"]{
-  --v1:#B9A6F2;--v2:#9278E6;--v3:#6E56CF;--v4:#4B3399;--lived:#D6457F;--wish:#F0A030;--accent:#C43A7A;
+  --v1:#F6B3CE;--v2:#EC86B0;--v3:#DC5A92;--v4:#C23B78;--lived:#7A1446;--wish:#F0A030;--accent:#C43A7A;
   --hero1:#E0649C;--hero2:#B02F6C;--hero3:#5E1640;
 }
-/* On a dark background more visits glow brighter, so every shade stays clear of the grey land. */
+:root[data-palette="violet"]{
+  --v1:#CBBDF6;--v2:#A993EC;--v3:#8468DB;--v4:#6447C2;--lived:#331E7A;--wish:#F0A030;--accent:#6E56CF;
+  --hero1:#9A85F0;--hero2:#5B3FC0;--hero3:#2C1A6E;
+}
+/* Rose and violet: one hue, home is the strongest shade. On a dark background the strongest
+   shade is the brightest (a dark one would disappear), so more visits glow brighter. */
 :root[data-theme="dark"][data-palette="rose"]{
-  --v1:#4E3F8F;--v2:#6A55C2;--v3:#8D78E8;--v4:#B7A6FF;--lived:#E86FA5;--wish:#F0A030;--accent:#E86FA5;
+  --v1:#7E3558;--v2:#A8467A;--v3:#CF5E97;--v4:#EE86B6;--lived:#FFC6DE;--accent:#E86FA5;
+}
+:root[data-theme="dark"][data-palette="violet"]{
+  --v1:#43377D;--v2:#5D4BAE;--v3:#7F6BDD;--v4:#A594F5;--lived:#DCD3FF;--accent:#9D8AF2;
 }
 :root[data-theme="dark"]{
   --bg:#0C1017;--card:#161B25;--ink:#F2F4F8;--muted:#8A93A5;--line:#232A37;--land:#283040;--stroke:#0C1017;--chip:#1E2430;
@@ -405,7 +413,7 @@ const T = {
     "sh.c": "Земље", "sh.d": "Дани", "sh.v": "Посете", "sh.share": "Подели", "sh.save": "Сачувај слику",
     "g.title": "Подешавања", "g.general": "Опште", "g.lang": "Језик", "g.langAuto": "Као на телефону",
     "g.theme": "Тема", "g.sys": "Систем", "g.light": "Светла", "g.dark": "Тамна",
-    "g.palette": "Боје", "g.blue": "Плава", "g.rose": "Роза", "g.home": "Матична валута", "g.mapMode": "Свет",
+    "g.palette": "Боје", "g.blue": "Плава", "g.rose": "Роза", "g.violet": "Љубичаста", "g.home": "Матична валута", "g.mapMode": "Свет",
     "g.globe": "Глобус", "g.flat": "Мапа",
     "g.rates": "Курсеви", "g.ratesAt": "Ажурирано {date}", "g.ratesNever": "Курсеви још нису преузети", "g.refresh": "Освежи",
     "g.manual": "Ручни курсеви", "g.manualHint": "Имају предност над аутоматским. Корисно у мењачници или без интернета.",
@@ -461,7 +469,7 @@ const T = {
     "sh.c": "Countries", "sh.d": "Days", "sh.v": "Visits", "sh.share": "Share", "sh.save": "Save image",
     "g.title": "Settings", "g.general": "General", "g.lang": "Language", "g.langAuto": "Same as phone",
     "g.theme": "Theme", "g.sys": "System", "g.light": "Light", "g.dark": "Dark",
-    "g.palette": "Colours", "g.blue": "Blue", "g.rose": "Rose", "g.home": "Home currency", "g.mapMode": "World",
+    "g.palette": "Colours", "g.blue": "Blue", "g.rose": "Rose", "g.violet": "Violet", "g.home": "Home currency", "g.mapMode": "World",
     "g.globe": "Globe", "g.flat": "Map",
     "g.rates": "Exchange rates", "g.ratesAt": "Updated {date}", "g.ratesNever": "Rates not downloaded yet", "g.refresh": "Refresh",
     "g.manual": "Manual rates", "g.manualHint": "They take priority over automatic rates. Handy at the exchange office or offline.",
@@ -517,7 +525,7 @@ const T = {
     "sh.c": "Land", "sh.d": "Dager", "sh.v": "Besøk", "sh.share": "Del", "sh.save": "Lagre bilde",
     "g.title": "Innstillinger", "g.general": "Generelt", "g.lang": "Språk", "g.langAuto": "Som telefonen",
     "g.theme": "Tema", "g.sys": "System", "g.light": "Lyst", "g.dark": "Mørkt",
-    "g.palette": "Farger", "g.blue": "Blå", "g.rose": "Rosa", "g.home": "Hjemmevaluta", "g.mapMode": "Verden",
+    "g.palette": "Farger", "g.blue": "Blå", "g.rose": "Rosa", "g.violet": "Lilla", "g.home": "Hjemmevaluta", "g.mapMode": "Verden",
     "g.globe": "Globus", "g.flat": "Kart",
     "g.rates": "Valutakurser", "g.ratesAt": "Oppdatert {date}", "g.ratesNever": "Kursene er ikke hentet ennå", "g.refresh": "Oppdater",
     "g.manual": "Manuelle kurser", "g.manualHint": "Går foran de automatiske. Nyttig på vekslingskontoret eller uten nett.",
@@ -1567,23 +1575,32 @@ function compact(n) {
 }
 
 /* ---------------- Share image ---------------- */
+// The share image always has a dark background, so each palette uses its dark-theme shades.
+const SHARE_COLORS = {
+  blue: { map: { v1: "#A9D1FF", v2: "#5FA8F5", v3: "#2F7BE0", v4: "#1D4FA3", lv: "#22B573", ws: "#FF7F6B" },
+          glow1: "rgba(43,79,168,.85)", glow2: "rgba(138,59,92,.7)", text: ["#8EC5FF", "#FF9C8A"] },
+  rose: { map: { v1: "#7E3558", v2: "#A8467A", v3: "#CF5E97", v4: "#EE86B6", lv: "#FFC6DE", ws: "#F0A030" },
+          glow1: "rgba(176,47,108,.8)", glow2: "rgba(94,22,64,.9)", text: ["#FFC6DE", "#EE86B6"] },
+  violet: { map: { v1: "#43377D", v2: "#5D4BAE", v3: "#7F6BDD", v4: "#A594F5", lv: "#DCD3FF", ws: "#F0A030" },
+          glow1: "rgba(91,63,192,.85)", glow2: "rgba(44,26,110,.9)", text: ["#DCD3FF", "#A594F5"] },
+};
 async function drawShare() {
   await document.fonts.load("800 40px Manrope").catch(() => {});
   const W = 1080, H = 1920, cv = document.createElement("canvas");
   cv.width = W; cv.height = H;
   const x = cv.getContext("2d");
-  const rose = S.settings.palette === "rose";
+  const P = SHARE_COLORS[S.settings.palette] || SHARE_COLORS.blue;
   x.fillStyle = "#0A0E18"; x.fillRect(0, 0, W, H);
   const g1 = x.createRadialGradient(200, 0, 0, 200, 0, 1100);
-  g1.addColorStop(0, rose ? "rgba(214,60,131,.75)" : "rgba(43,79,168,.85)"); g1.addColorStop(1, "rgba(10,14,24,0)");
+  g1.addColorStop(0, P.glow1); g1.addColorStop(1, "rgba(10,14,24,0)");
   x.fillStyle = g1; x.fillRect(0, 0, W, H);
   const g2 = x.createRadialGradient(W, H, 0, W, H, 900);
-  g2.addColorStop(0, rose ? "rgba(138,99,245,.55)" : "rgba(138,59,92,.7)"); g2.addColorStop(1, "rgba(10,14,24,0)");
+  g2.addColorStop(0, P.glow2); g2.addColorStop(1, "rgba(10,14,24,0)");
   x.fillStyle = g2; x.fillRect(0, 0, W, H);
   const F = (w, s) => `${w} ${s}px Manrope, sans-serif`;
   // brand
   const cg = x.createConicGradient ? x.createConicGradient(3.5, 112, 150) : null;
-  if (cg) { ["v2", "v4", "lived", "wish", "v2"].forEach((v, i) => cg.addColorStop(i / 4, cssVar("--" + v))); x.fillStyle = cg; } else x.fillStyle = cssVar("--v3");
+  if (cg) { [P.map.v2, P.map.v4, P.map.lv, P.map.ws, P.map.v2].forEach((c, i) => cg.addColorStop(i / 4, c)); x.fillStyle = cg; } else x.fillStyle = P.map.v3;
   x.beginPath(); x.arc(112, 150, 26, 0, 7); x.fill();
   x.fillStyle = "#fff"; x.font = F(800, 44); x.textBaseline = "middle"; x.fillText("GlobeTint", 156, 152);
   // headline
@@ -1592,7 +1609,7 @@ async function drawShare() {
   x.font = F(800, 118); x.fillText(t("sh.head"), 80, 400);
   const pct = t("sh.pct", { p: fmtPct(w.pct) });
   const tg = x.createLinearGradient(80, 0, 1000, 0);
-  tg.addColorStop(0, rose ? "#FFC2DA" : "#8EC5FF"); tg.addColorStop(1, rose ? "#C9B2FF" : "#FF9C8A");
+  tg.addColorStop(0, P.text[0]); tg.addColorStop(1, P.text[1]);
   x.fillStyle = tg;
   let fs = 108; x.font = F(800, fs);
   while (x.measureText(pct).width > 920 && fs > 60) { fs -= 4; x.font = F(800, fs); }
@@ -1603,7 +1620,7 @@ async function drawShare() {
   // map
   const proj = d3.geoEqualEarth().rotate([-11, 0]).fitExtent([[40, 680], [W - 40, 1180]], { type: "Sphere" });
   const path = d3.geoPath(proj, x);
-  const col = { v1: cssVar("--v1"), v2: cssVar("--v2"), v3: cssVar("--v3"), v4: cssVar("--v4"), lv: cssVar("--lived"), ws: cssVar("--wish") };
+  const col = P.map;
   x.lineWidth = 1; x.strokeStyle = "#0A0E18";
   for (const f of FEATURES) {
     x.beginPath(); path(f);
@@ -1616,7 +1633,7 @@ async function drawShare() {
     const c = counts(k);
     x.fillStyle = "#fff"; x.font = F(700, 36); x.fillText(t("r." + k), 80, y + 12);
     x.fillStyle = "rgba(255,255,255,.1)"; roundRect(x, 330, y - 8, 560, 16, 8); x.fill();
-    if (c.pct > 0) { const bg = x.createLinearGradient(330, 0, 890, 0); bg.addColorStop(0, rose ? "#FFC2DA" : "#8EC5FF"); bg.addColorStop(1, rose ? "#C9B2FF" : "#FF9C8A"); x.fillStyle = bg; roundRect(x, 330, y - 8, Math.max(16, 560 * c.pct / 100), 16, 8); x.fill(); }
+    if (c.pct > 0) { const bg = x.createLinearGradient(330, 0, 890, 0); bg.addColorStop(0, P.text[0]); bg.addColorStop(1, P.text[1]); x.fillStyle = bg; roundRect(x, 330, y - 8, Math.max(16, 560 * c.pct / 100), 16, 8); x.fill(); }
     x.fillStyle = "rgba(255,255,255,.7)"; x.font = F(700, 34); x.textAlign = "right"; x.fillText(Math.round(c.pct) + "%", W - 80, y + 12); x.textAlign = "left";
     y += 74;
   }
@@ -1685,7 +1702,7 @@ function renderSettings() {
       <label class="set">${t("g.lang")}<select data-sel="lang">${[["auto", t("g.langAuto")], ["sr", "Српски"], ["en", "English"], ["nb", "Norsk"]].map(([v, l]) => `<option value="${v}" ${s.lang === v ? "selected" : ""}>${l}</option>`).join("")}</select></label>
       <label class="set">${t("g.home")}<select data-sel="home">${CURRENCIES.map(c => `<option value="${c}" ${home === c ? "selected" : ""}>${c}</option>`).join("")}</select></label>
       <div class="set">${t("g.theme")}${seg("theme", [["system", t("g.sys")], ["light", t("g.light")], ["dark", t("g.dark")]])}</div>
-      <div class="set">${t("g.palette")}${seg("palette", [["blue", "🔵 " + t("g.blue")], ["rose", "🌸 " + t("g.rose")]])}</div>
+      <div class="set">${t("g.palette")}${seg("palette", [["blue", t("g.blue")], ["rose", t("g.rose")], ["violet", t("g.violet")]])}</div>
       <div class="set">${t("g.mapMode")}${seg("mapMode", [["globe", t("g.globe")], ["flat", t("g.flat")]])}</div>
     </div></div>
     <div class="group"><div class="lbl">${t("g.rates")}</div><div class="card" style="padding:2px 16px">
