@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A globe with a few tinted countries, kept inside the 66dp safe zone. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path android:fillColor="#EAF1FF" android:pathData="M54,30a24,24 0,1 1,0 48a24,24 0,1 1,0 -48z" />
+    <group>
+        <clip-path android:pathData="M54,30a24,24 0,1 1,0 48a24,24 0,1 1,0 -48z" />
+        <path android:fillColor="#A9D1FF" android:pathData="M30,40C36,33 44,31 50,34C53,38 49,43 44,44C40,47 41,52 36,53C32,52 29,47 30,40z" />
+        <path android:fillColor="#5FA8F5" android:pathData="M53,36C59,33 66,35 70,40C71,44 66,46 62,45C58,47 54,45 53,41z" />
+        <path android:fillColor="#1D4FA3" android:pathData="M57,49C62,47 68,49 73,53C74,58 71,64 66,66C62,64 60,60 57,58C55,55 55,51 57,49z" />
+        <path android:fillColor="#22B573" android:pathData="M47,47C50,46 53,48 53,51C52,54 49,55 47,53C45,51 45,48 47,47z" />
+        <path android:fillColor="#FF7F6B" android:pathData="M40,60C44,58 49,60 50,65C50,70 46,75 42,74C38,71 37,64 40,60z" />
+        <path android:fillColor="#00000000" android:strokeColor="#3316336F" android:strokeWidth="1"
+            android:pathData="M54,30C44,38 44,70 54,78M54,30C64,38 64,70 54,78M30,54h48" />
+    </group>
+    <path android:fillColor="#00000000" android:strokeColor="#FFFFFF" android:strokeWidth="2"
+        android:pathData="M54,30a24,24 0,1 1,0 48a24,24 0,1 1,0 -48z" />
+</vector>

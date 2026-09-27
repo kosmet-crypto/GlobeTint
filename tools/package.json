@@ -1,0 +1,14 @@
+{
+  "name": "globetint-tools",
+  "private": true,
+  "type": "module",
+  "scripts": { "build-data": "node build-data.mjs" },
+  "devDependencies": {
+    "country-to-currency": "^3.0.1",
+    "d3-geo": "^3.1.1",
+    "i18n-iso-countries": "^7.14.0",
+    "topojson-client": "^3.1.0",
+    "topojson-simplify": "^3.0.3",
+    "world-atlas": "^2.0.2"
+  }
+}
