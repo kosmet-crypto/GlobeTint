@@ -1,0 +1,453 @@
+<!doctype html>
+<html lang="sr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GlobeTint – нацрт</title>
+<style>
+@font-face{font-family:Manrope;font-weight:200 800;font-display:block;src:url(fonts/manrope-cyrillic-wght-normal.woff2) format("woff2");unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:Manrope;font-weight:200 800;font-display:block;src:url(fonts/manrope-latin-ext-wght-normal.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:Manrope;font-weight:200 800;font-display:block;src:url(fonts/manrope-latin-wght-normal.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+
+:root{
+  --v1:#A9D1FF; --v2:#5FA8F5; --v3:#2F7BE0; --v4:#1D4FA3;
+  --lived:#22B573; --wish:#FF7F6B;
+}
+.phone{
+  --bg:#F4F6FA; --card:#FFFFFF; --ink:#11151C; --muted:#6B7382; --line:#E7EAF0;
+  --land:#DDE2EA; --stroke:#FFFFFF; --sea:#F4F6FA; --accent:#2F7BE0; --chip:#EEF1F6;
+  --shadow:0 1px 2px rgba(17,21,28,.04),0 8px 24px rgba(17,21,28,.06);
+}
+.phone.dark{
+  --bg:#0C1017; --card:#161B25; --ink:#F2F4F8; --muted:#8A93A5; --line:#232A37;
+  --land:#262E3C; --stroke:#0C1017; --sea:#0C1017; --chip:#1E2430;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Manrope,system-ui,sans-serif;background:#D9DEE7;color:#11151C;padding:40px;
+  display:flex;flex-wrap:wrap;gap:40px;justify-content:center;-webkit-font-smoothing:antialiased}
+.frame{display:flex;flex-direction:column;gap:12px;align-items:center}
+.frame>h2{font-size:15px;font-weight:700;color:#3A4250}
+.phone{width:390px;height:844px;border-radius:46px;overflow:hidden;position:relative;background:var(--bg);color:var(--ink);
+  box-shadow:0 0 0 10px #10131A,0 30px 60px rgba(0,0,0,.25);font-feature-settings:"tnum" 1}
+.status{height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;font-size:14px;font-weight:700}
+.status .ic{display:flex;gap:6px;align-items:center}
+.status .ic i{display:block;width:16px;height:10px;border-radius:2px;background:currentColor;opacity:.85}
+.status .ic i:first-child{width:14px;border-radius:50% 50% 2px 2px;opacity:.6}
+
+.top{display:flex;align-items:center;justify-content:space-between;padding:6px 20px 10px}
+.brand{font-size:22px;font-weight:800;letter-spacing:-.5px;display:flex;align-items:center;gap:8px}
+.brand .dot{width:22px;height:22px;border-radius:50%;background:conic-gradient(from 200deg,var(--v2),var(--v4),var(--lived),var(--wish),var(--v2))}
+.iconbtn{width:40px;height:40px;border-radius:14px;background:var(--card);box-shadow:var(--shadow);display:grid;place-items:center}
+.iconbtn svg{width:20px;height:20px;stroke:var(--ink);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+
+.chips{display:flex;gap:8px;padding:0 20px 8px;overflow:hidden}
+.chip{flex:none;padding:8px 14px;border-radius:999px;background:var(--chip);font-size:13px;font-weight:600;color:var(--muted)}
+.chip.on{background:var(--ink);color:var(--bg)}
+
+.map{width:100%;display:block}
+.map path{stroke:var(--stroke);stroke-width:.5;stroke-linejoin:round}
+.map path.sel{stroke:var(--ink);stroke-width:1.6}
+.map .sphere{fill:var(--card);stroke:var(--line);stroke-width:1}
+.map .grat{fill:none;stroke:var(--line);stroke-width:.5}
+.map .glow{fill:url(#shade);stroke:none;pointer-events:none}
+.dots circle{stroke:var(--stroke);stroke-width:1}
+
+.sheet{position:absolute;left:0;right:0;bottom:84px;background:var(--card);border-radius:28px 28px 0 0;box-shadow:0 -10px 40px rgba(17,21,28,.10);padding:10px 20px 18px}
+.grab{width:38px;height:5px;border-radius:3px;background:var(--line);margin:0 auto 14px}
+.big{display:flex;align-items:flex-end;justify-content:space-between}
+.big .n{font-size:44px;font-weight:800;letter-spacing:-1.5px;line-height:1}
+.big .n small{font-size:20px;color:var(--muted);font-weight:700;letter-spacing:0}
+.big .pct{font-size:14px;color:var(--muted);font-weight:600;text-align:right}
+.big .pct b{display:block;font-size:26px;color:var(--accent);font-weight:800;letter-spacing:-.5px}
+.lbl{font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.8px}
+
+.legend{display:flex;gap:14px;margin:14px 0 4px;font-size:12px;font-weight:600;color:var(--muted)}
+.legend span{display:flex;align-items:center;gap:6px}
+.legend i{width:10px;height:10px;border-radius:3px;display:block}
+.ramp{display:flex;gap:2px}.ramp i{width:7px}
+
+.bars{display:grid;gap:10px;margin-top:14px}
+.bar{display:grid;grid-template-columns:88px 1fr 54px;align-items:center;gap:10px;font-size:13px;font-weight:600}
+.bar .t{height:8px;border-radius:4px;background:var(--chip);overflow:hidden}
+.bar .t i{display:block;height:100%;border-radius:4px;background:linear-gradient(90deg,var(--v2),var(--v3))}
+.bar em{font-style:normal;color:var(--muted);text-align:right;font-size:12px}
+
+.nav{position:absolute;left:0;right:0;bottom:0;height:84px;background:var(--card);border-top:1px solid var(--line);display:flex;justify-content:space-around;padding-top:10px}
+.nav a{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11px;font-weight:700;color:var(--muted);text-decoration:none;width:90px}
+.nav a svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.nav a.on{color:var(--ink)}
+.nav a.on .pill{background:var(--chip)}
+.nav .pill{padding:4px 18px;border-radius:14px;display:grid;place-items:center}
+
+/* country sheet */
+.ctitle{display:flex;align-items:center;gap:12px}
+.flag{font-size:34px;line-height:1}
+.ctitle h3{font-size:22px;font-weight:800;letter-spacing:-.4px}
+.ctitle p{font-size:13px;color:var(--muted);font-weight:600}
+.seg{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:14px 0;background:var(--chip);padding:4px;border-radius:14px}
+.seg b{font-size:12px;font-weight:700;text-align:center;padding:9px 0;border-radius:10px;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:3px}
+.seg b i{width:8px;height:8px;border-radius:50%;display:block}
+.seg b.on{background:var(--card);color:var(--ink);box-shadow:var(--shadow)}
+.visit{display:flex;align-items:center;gap:12px;padding:11px 0;border-top:1px solid var(--line)}
+.visit .num{width:32px;height:32px;border-radius:10px;display:grid;place-items:center;font-size:13px;font-weight:800;color:#fff}
+.visit div{flex:1}
+.visit strong{display:block;font-size:14px;font-weight:700}
+.visit span{font-size:12px;color:var(--muted);font-weight:600}
+.visit .go{color:var(--muted);font-size:18px}
+.add{margin-top:10px;border:1.5px dashed var(--line);border-radius:14px;padding:12px;text-align:center;font-size:14px;font-weight:700;color:var(--accent)}
+
+/* trip */
+.pad{padding:0 20px}
+.hero{border-radius:26px;padding:20px;color:#fff;background:radial-gradient(120% 140% at 100% 0%,#4C8DF0 0%,#2254B8 45%,#16336F 100%);box-shadow:0 14px 30px rgba(33,84,184,.35);position:relative;overflow:hidden}
+.hero:after{content:"";position:absolute;right:-40px;top:-40px;width:160px;height:160px;border-radius:50%;border:24px solid rgba(255,255,255,.07)}
+.hero .row{display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:600;opacity:.85}
+.hero h3{font-size:20px;font-weight:800;margin:6px 0 16px;letter-spacing:-.3px}
+.hero .sum{font-size:38px;font-weight:800;letter-spacing:-1.2px;line-height:1}
+.hero .sum small{font-size:18px;font-weight:700;opacity:.8;letter-spacing:0}
+.hero .prog{height:8px;border-radius:4px;background:rgba(255,255,255,.2);margin:14px 0 8px;overflow:hidden}
+.hero .prog i{display:block;height:100%;width:58%;background:#fff;border-radius:4px}
+.hero .meta{display:flex;justify-content:space-between;font-size:12px;font-weight:600;opacity:.85}
+.gps{display:flex;align-items:center;gap:10px;background:var(--card);box-shadow:var(--shadow);border-radius:18px;padding:12px 14px;margin:14px 0 0;font-size:13px;font-weight:600}
+.gps .flag{font-size:26px}
+.gps div{flex:1}.gps div span{display:block;color:var(--muted);font-size:12px}
+.gps b{background:var(--ink);color:var(--bg);font-size:12px;padding:8px 12px;border-radius:10px}
+.cats{display:flex;height:10px;border-radius:5px;overflow:hidden;gap:2px;margin:18px 0 10px}
+.catleg{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;font-weight:600;color:var(--muted)}
+.catleg span{display:flex;align-items:center;gap:5px}.catleg i{width:8px;height:8px;border-radius:50%}
+.h4{display:flex;justify-content:space-between;align-items:baseline;margin:20px 0 6px}
+.h4 b{font-size:16px;font-weight:800}.h4 span{font-size:13px;color:var(--accent);font-weight:700}
+.exp{display:flex;align-items:center;gap:12px;padding:10px 0}
+.exp .em{width:42px;height:42px;border-radius:14px;background:var(--chip);display:grid;place-items:center;font-size:20px}
+.exp div{flex:1;min-width:0}
+.exp strong{display:block;font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.exp span{font-size:12px;color:var(--muted);font-weight:600}
+.exp .amt{text-align:right}
+.exp .amt strong{font-size:15px}
+.tag{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.4px;color:var(--wish);background:rgba(255,127,107,.12);padding:2px 6px;border-radius:6px;margin-left:4px}
+.fab{position:absolute;right:20px;bottom:104px;width:62px;height:62px;border-radius:22px;background:var(--ink);color:var(--bg);display:grid;place-items:center;font-size:32px;font-weight:400;box-shadow:0 12px 26px rgba(17,21,28,.3)}
+
+/* add expense */
+.scrim{position:absolute;inset:0;background:rgba(10,14,22,.45)}
+.sheet.full{bottom:0;top:118px;padding-bottom:24px}
+.where{display:flex;justify-content:center;gap:8px;align-items:center;font-size:13px;font-weight:700;color:var(--muted)}
+.where b{background:var(--chip);color:var(--ink);padding:6px 12px;border-radius:999px}
+.amount{text-align:center;margin:14px 0 2px;font-size:52px;font-weight:800;letter-spacing:-2px}
+.amount small{font-size:22px;color:var(--muted);letter-spacing:0;font-weight:700}
+.conv{text-align:center;font-size:14px;font-weight:700;color:var(--accent)}
+.conv span{color:var(--muted);font-weight:600}
+.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:16px 0 12px}
+.grid div{display:flex;flex-direction:column;align-items:center;gap:5px;padding:10px 0 8px;border-radius:16px;background:var(--chip);font-size:10.5px;font-weight:700;color:var(--muted);text-align:center;line-height:1.15}
+.grid div em{font-style:normal;font-size:22px}
+.grid div.on{background:var(--ink);color:var(--bg)}
+.opts{display:flex;gap:8px;align-items:center}
+.mini{display:flex;background:var(--chip);border-radius:12px;padding:3px}
+.mini b{font-size:12px;font-weight:700;padding:7px 11px;border-radius:9px;color:var(--muted)}
+.mini b.on{background:var(--card);color:var(--ink);box-shadow:var(--shadow)}
+.sw{margin-left:auto;display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;color:var(--muted)}
+.sw i{width:40px;height:24px;border-radius:12px;background:var(--line);position:relative}
+.sw i:after{content:"";position:absolute;left:3px;top:3px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.keys{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}
+.keys b{height:50px;border-radius:14px;display:grid;place-items:center;font-size:22px;font-weight:700;background:var(--bg)}
+.save{margin-top:12px;height:54px;border-radius:18px;background:var(--accent);color:#fff;display:grid;place-items:center;font-size:16px;font-weight:800}
+
+/* stats */
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tile{background:var(--card);border-radius:22px;padding:16px;box-shadow:var(--shadow)}
+.tile .v{font-size:28px;font-weight:800;letter-spacing:-.8px;margin-top:6px}
+.tile .v small{font-size:14px;color:var(--muted);font-weight:700;letter-spacing:0}
+.tile .s{font-size:12px;color:var(--muted);font-weight:600;margin-top:2px}
+.rings{display:flex;justify-content:space-between;background:var(--card);border-radius:22px;padding:16px 14px;box-shadow:var(--shadow);margin-top:10px}
+.ring{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:11px;font-weight:700;color:var(--muted)}
+.ring svg{width:54px;height:54px}
+.ring text{font:800 13px Manrope;fill:var(--ink)}
+.list{background:var(--card);border-radius:22px;padding:6px 16px;box-shadow:var(--shadow);margin-top:10px}
+.trip{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--line)}
+.trip:first-child{border-top:0}
+.trip .fl{font-size:16px;white-space:nowrap;width:66px}
+.trip div{flex:1}.trip strong{font-size:14px;font-weight:700;display:block}.trip span{font-size:12px;color:var(--muted);font-weight:600}
+.trip .amt{text-align:right;font-size:14px;font-weight:800}
+.trip .amt span{display:block;font-weight:600}
+
+/* share card */
+.story{position:absolute;inset:0;padding:54px 26px 30px;color:#fff;
+  background:radial-gradient(90% 60% at 20% 0%,#2B4FA8 0%,transparent 60%),radial-gradient(80% 50% at 100% 100%,#8A3B5C 0%,transparent 60%),#0A0E18;display:flex;flex-direction:column}
+.story .brand{font-size:16px;opacity:.9}
+.story h1{font-size:40px;font-weight:800;letter-spacing:-1.4px;line-height:1.05;margin:26px 0 4px}
+.story h1 span{background:linear-gradient(90deg,#8EC5FF,#FF9C8A);-webkit-background-clip:text;background-clip:text;color:transparent}
+.story p{font-size:15px;font-weight:600;opacity:.7}
+.story{--land:rgba(255,255,255,.13)}
+.story .map path{stroke:#0A0E18;stroke-width:.4}
+.story .nums{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:auto}
+.story .nums div{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:14px 12px}
+.story .nums b{display:block;font-size:26px;font-weight:800;letter-spacing:-.6px}
+.story .nums span{font-size:11px;font-weight:700;opacity:.65;text-transform:uppercase;letter-spacing:.6px}
+.story .cont{display:grid;gap:11px;margin:30px 0 0}
+.story .cont div{display:grid;grid-template-columns:78px 1fr 40px;gap:10px;align-items:center;font-size:13px;font-weight:700}
+.story .cont .t{height:6px;border-radius:3px;background:rgba(255,255,255,.1);overflow:hidden}
+.story .cont .t i{display:block;height:100%;background:linear-gradient(90deg,#8EC5FF,#FF9C8A);border-radius:3px}
+.story .cont em{font-style:normal;text-align:right;opacity:.7}
+.story .foot{text-align:center;font-size:12px;font-weight:700;opacity:.45;margin-top:14px;letter-spacing:.5px}
+</style>
+</head>
+<body>
+
+<script src="vendor/d3-array.min.js"></script>
+<script src="vendor/d3-geo.min.js"></script>
+<script src="vendor/topojson-client.min.js"></script>
+<script src="vendor/world-50m.js"></script>
+
+<!-- 1 · Map, world, light -->
+<section class="frame"><h2>1 · Мапа — свет</h2>
+<div class="phone" id="s1">
+  <div class="status"><span>9:41</span><span class="ic"><i></i><i></i></span></div>
+  <div class="top"><div class="brand"><span class="dot"></span>GlobeTint</div>
+    <div class="iconbtn"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></div></div>
+  <div class="chips"><span class="chip on">Свет</span><span class="chip">Европа</span><span class="chip">Азија</span><span class="chip">Африка</span><span class="chip">Америка</span><span class="chip">Океанија</span></div>
+  <svg class="map" data-view="globe" viewBox="0 0 390 330"></svg>
+  <div class="sheet">
+    <div class="grab"></div>
+    <div class="big"><div><div class="lbl">Посећене земље</div><div class="n">32 <small>/ 195</small></div></div>
+      <div class="pct">света<b>16,4 %</b></div></div>
+    <div class="legend"><span><span class="ramp"><i style="background:var(--v1)"></i><i style="background:var(--v2)"></i><i style="background:var(--v3)"></i><i style="background:var(--v4)"></i></span>Посећено</span>
+      <span><i style="background:var(--lived)"></i>Дом</span><span><i style="background:var(--wish)"></i>Жеља</span></div>
+    <div class="bars">
+      <div class="bar">Европа<span class="t"><i style="width:58%"></i></span><em>28/48</em></div>
+      <div class="bar">Азија<span class="t"><i style="width:5%"></i></span><em>2/44</em></div>
+      <div class="bar">Африка<span class="t"><i style="width:2%"></i></span><em>1/54</em></div>
+      <div class="bar">Америка<span class="t"><i style="width:3%"></i></span><em>1/35</em></div>
+      <div class="bar">Океанија<span class="t"><i style="width:0%"></i></span><em>0/14</em></div>
+    </div>
+  </div>
+  <nav class="nav"></nav>
+</div></section>
+
+<!-- 2 · Map, Europe + country sheet -->
+<section class="frame"><h2>2 · Европа + детаљи земље</h2>
+<div class="phone" id="s2">
+  <div class="status"><span>9:41</span><span class="ic"><i></i><i></i></span></div>
+  <div class="chips" style="padding-top:6px"><span class="chip">Свет</span><span class="chip on">Европа</span><span class="chip">Азија</span><span class="chip">Африка</span><span class="chip">Америка</span></div>
+  <svg class="map" data-view="focus" data-sel="380" viewBox="0 0 390 420"></svg>
+  <div class="sheet">
+    <div class="grab"></div>
+    <div class="ctitle"><span class="flag">🇮🇹</span><div><h3>Италија</h3><p>Европа · 3 посете · 19 дана</p></div></div>
+    <div class="seg"><b class="on"><i style="background:var(--v3)"></i>Посећено</b><b><i style="background:var(--lived)"></i>Дом</b><b><i style="background:var(--wish)"></i>Жеља</b><b><i style="background:var(--land)"></i>Ништа</b></div>
+    <div class="visit"><span class="num" style="background:var(--v4)">3</span><div><strong>Рим, Фиренца</strong><span>4. – 11. јун 2025</span></div><span class="go">›</span></div>
+    <div class="visit"><span class="num" style="background:var(--v3)">2</span><div><strong>Венеција</strong><span>18. – 21. окт 2022</span></div><span class="go">›</span></div>
+    <div class="visit"><span class="num" style="background:var(--v2)">1</span><div><strong>Милано, Комо</strong><span>2. – 9. авг 2019</span></div><span class="go">›</span></div>
+    <div class="add">+ Додај посету</div>
+  </div>
+  <nav class="nav"></nav>
+</div></section>
+
+<!-- 3 · Current trip -->
+<section class="frame"><h2>3 · Путовање</h2>
+<div class="phone" id="s3">
+  <div class="status"><span>9:41</span><span class="ic"><i></i><i></i></span></div>
+  <div class="top"><div class="brand" style="font-size:26px">Путовање</div>
+    <div class="iconbtn"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg></div></div>
+  <div class="pad">
+    <div class="hero">
+      <div class="row"><span>🇦🇹 🇭🇺 🇸🇰 · 12–20. окт</span><span>Дан 5 / 9</span></div>
+      <h3>Централна Европа</h3>
+      <div class="sum">8 740 <small>NOK</small></div>
+      <div class="prog"><i></i></div>
+      <div class="meta"><span>Буџет 15 000 NOK</span><span>≈ 1 748 NOK / дан</span></div>
+    </div>
+    <div class="gps"><span class="flag">📍</span><div>Изгледа да си у Мађарској<span>Валута: HUF · 1 NOK = 34,40 HUF</span></div><b>Пребаци</b></div>
+    <div class="cats">
+      <i style="flex:34;background:#6C8CFF"></i><i style="flex:22;background:#FFB547"></i><i style="flex:16;background:#22B573"></i><i style="flex:12;background:#FF7F6B"></i><i style="flex:9;background:#A17BF5"></i><i style="flex:7;background:#9AA3B2"></i></div>
+    <div class="catleg"><span><i style="background:#6C8CFF"></i>Смештај 34%</span><span><i style="background:#FFB547"></i>Ресторани 22%</span><span><i style="background:#22B573"></i>Превоз 16%</span><span><i style="background:#FF7F6B"></i>Музеји 12%</span><span><i style="background:#A17BF5"></i>Намирнице 9%</span></div>
+    <div class="h4"><b>Данас</b><span>Сви трошкови</span></div>
+    <div class="exp"><span class="em">🏛️</span><div><strong>Парламент, тура</strong><span>🇭🇺 12 000 HUF · картица</span></div><div class="amt"><strong>349</strong><span>NOK</span></div></div>
+    <div class="exp"><span class="em">🍽️</span><div><strong>Гулаш, Кертес</strong><span>🇭🇺 6 800 HUF · готовина</span></div><div class="amt"><strong>198</strong><span>NOK</span></div></div>
+    <div class="exp"><span class="em">👕</span><div><strong>Јакна<span class="tag">ЛИЧНО</span></strong><span>🇭🇺 29 990 HUF · картица</span></div><div class="amt"><strong>872</strong><span>NOK</span></div></div>
+  </div>
+  <div class="fab">+</div>
+  <nav class="nav"></nav>
+</div></section>
+
+<!-- 4 · Add expense -->
+<section class="frame"><h2>4 · Нови трошак</h2>
+<div class="phone" id="s4">
+  <div class="status"><span>9:41</span><span class="ic"><i></i><i></i></span></div>
+  <div class="scrim"></div>
+  <div class="sheet full">
+    <div class="grab"></div>
+    <div class="where"><b>🇭🇺 Мађарска · HUF ▾</b><b>Данас ▾</b></div>
+    <div class="amount">12 500 <small>HUF</small></div>
+    <div class="conv">≈ 363 NOK <span>· курс 34,40</span></div>
+    <div class="grid">
+      <div class="on"><em>🍽️</em>Ресторан</div><div><em>🍔</em>Брза храна</div><div><em>🛒</em>Намирнице</div><div><em>🏨</em>Смештај</div><div><em>🚆</em>Превоз</div>
+      <div><em>🏛️</em>Музеји</div><div><em>🎁</em>Сувенири</div><div><em>👕</em>Одећа</div><div><em>📱</em>Техника</div><div><em>✨</em>Остало</div>
+    </div>
+    <div class="opts"><div class="mini"><b class="on">Картица</b><b>Готовина</b></div><span class="sw">Лична куповина<i></i></span></div>
+    <div class="keys"><b>1</b><b>2</b><b>3</b><b>4</b><b>5</b><b>6</b><b>7</b><b>8</b><b>9</b><b>,</b><b>0</b><b>⌫</b></div>
+    <div class="save">Сачувај</div>
+  </div>
+</div></section>
+
+<!-- 5 · Stats -->
+<section class="frame"><h2>5 · Статистика</h2>
+<div class="phone" id="s5">
+  <div class="status"><span>9:41</span><span class="ic"><i></i><i></i></span></div>
+  <div class="top"><div class="brand" style="font-size:26px">Статистика</div>
+    <div class="iconbtn"><svg viewBox="0 0 24 24"><path d="M12 3v12M7 8l5-5 5 5M5 14v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"/></svg></div></div>
+  <div class="pad">
+    <div class="tiles">
+      <div class="tile"><div class="lbl">Земље</div><div class="v">32 <small>/ 195</small></div><div class="s">+4 ове године</div></div>
+      <div class="tile"><div class="lbl">Континенти</div><div class="v">4 <small>/ 5</small></div><div class="s">фали Океанија</div></div>
+      <div class="tile"><div class="lbl">Путовања</div><div class="v">23</div><div class="s">148 дана на путу</div></div>
+      <div class="tile"><div class="lbl">Потрошено</div><div class="v">184k <small>NOK</small></div><div class="s">без личних куповина</div></div>
+    </div>
+    <div class="rings" id="rings"></div>
+    <div class="h4"><b>Путовања</b><span>2025 ▾</span></div>
+    <div class="list">
+      <div class="trip"><span class="fl">🇦🇹🇭🇺🇸🇰</span><div><strong>Централна Европа</strong><span>окт · 9 дана</span></div><div class="amt">8 740<span>NOK</span></div></div>
+      <div class="trip"><span class="fl">🇮🇹</span><div><strong>Рим и Фиренца</strong><span>јун · 8 дана</span></div><div class="amt">14 210<span>NOK</span></div></div>
+      <div class="trip"><span class="fl">🇷🇸🇲🇪</span><div><strong>Лето код куће</strong><span>јул · 21 дан</span></div><div class="amt">11 530<span>NOK</span></div></div>
+    </div>
+  </div>
+  <nav class="nav"></nav>
+</div></section>
+
+<!-- 6 · Share image -->
+<section class="frame"><h2>6 · Слика за дељење (9:16)</h2>
+<div class="phone" id="s6">
+  <div class="story">
+    <div class="brand"><span class="dot"></span>GlobeTint</div>
+    <h1>Мој свет<br><span>16,4 % обиђено</span></h1>
+    <p>32 земље · 4 континента · 23 путовања</p>
+    <svg class="map" data-view="world" data-dark="1" viewBox="0 0 340 190" style="margin-top:30px"></svg>
+    <div class="cont">
+      <div>Европа<span class="t"><i style="width:58%"></i></span><em>58%</em></div>
+      <div>Азија<span class="t"><i style="width:5%"></i></span><em>5%</em></div>
+      <div>Африка<span class="t"><i style="width:2%"></i></span><em>2%</em></div>
+      <div>Америка<span class="t"><i style="width:3%"></i></span><em>3%</em></div>
+      <div>Океанија<span class="t"><i style="width:0%"></i></span><em>0%</em></div>
+    </div>
+    <div class="nums"><div><b>32</b><span>земље</span></div><div><b>148</b><span>дана</span></div><div><b>61</b><span>посета</span></div></div>
+    <div class="foot">globetint</div>
+  </div>
+</div></section>
+
+<!-- 7 · Map, dark -->
+<section class="frame"><h2>7 · Тамна тема</h2>
+<div class="phone dark" id="s7">
+  <div class="status"><span>9:41</span><span class="ic"><i></i><i></i></span></div>
+  <div class="top"><div class="brand"><span class="dot"></span>GlobeTint</div>
+    <div class="iconbtn"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/></svg></div></div>
+  <div class="chips"><span class="chip">Свет</span><span class="chip on">Европа</span><span class="chip">Азија</span><span class="chip">Африка</span><span class="chip">Америка</span></div>
+  <svg class="map" data-view="europe" viewBox="0 0 390 520"></svg>
+  <div class="sheet" style="box-shadow:none;border-top:1px solid var(--line)">
+    <div class="grab"></div>
+    <div class="big"><div><div class="lbl">Европа</div><div class="n">28 <small>/ 48</small></div></div>
+      <div class="pct">континента<b>58 %</b></div></div>
+    <div class="legend"><span><span class="ramp"><i style="background:var(--v1)"></i><i style="background:var(--v2)"></i><i style="background:var(--v3)"></i><i style="background:var(--v4)"></i></span>Посећено</span>
+      <span><i style="background:var(--lived)"></i>Дом</span><span><i style="background:var(--wish)"></i>Жеља</span></div>
+  </div>
+  <nav class="nav"></nav>
+</div></section>
+
+<script>
+// ---- Demo data (ISO 3166 numeric) ----
+const LIVED = ["688","578"];                      // Србија, Норвешка
+const VISITS = {                                   // број посета
+  "348":5,"300":5,"191":4,"499":4,"040":3,"070":3,"380":3,"752":3,"203":2,"807":2,
+  "100":2,"705":2,"276":2,"208":2,"792":2,"642":1,"250":1,"724":1,"246":1,"616":1,
+  "528":1,"826":1,"620":1,"818":1,"784":1,"764":1,"840":1,"703":1,"756":1,"008":1
+};
+const WISH = ["392","352","604","036","504","124","484"];
+// UN-view merges: the app counts these areas as part of the listed country.
+const MERGE = {"Kosovo":"688","N. Cyprus":"196","Somaliland":"706"};
+
+function color(id){
+  if (LIVED.includes(id)) return "var(--lived)";
+  const v = VISITS[id];
+  if (v) return v>=5?"var(--v4)":v>=3?"var(--v3)":v===2?"var(--v2)":"var(--v1)";
+  if (WISH.includes(id)) return "var(--wish)";
+  return "var(--land)";
+}
+
+const topo = WORLD, obj = topo.objects.countries;
+const byId = new Map();
+for (const g of obj.geometries) {
+  if (g.properties.name === "Antarctica") continue;
+  const id = MERGE[g.properties.name] || g.id || g.properties.name;
+  (byId.get(id) || byId.set(id, []).get(id)).push(g);
+}
+const features = [...byId].map(([id, geoms]) =>
+  ({type:"Feature", id, geometry: geoms.length>1 ? topojson.merge(topo, geoms) : topojson.feature(topo, geoms[0]).geometry}));
+
+// Microstates get a dot so they stay tappable.
+const MICRO = ["336","492","674","438","020","470"]; // Ватикан, Монако, Сан Марино, Лихтенштајн, Андора, Малта
+const MICRO_DEMO = {"336":"var(--v1)","674":"var(--wish)","492":"var(--v1)","470":"var(--land)","438":"var(--land)","020":"var(--land)"};
+
+function draw(svg){
+  const [,, w, h] = svg.getAttribute("viewBox").split(" ").map(Number);
+  const view = svg.dataset.view, sel = svg.dataset.sel;
+  let proj;
+  const ns = "http://www.w3.org/2000/svg";
+  if (view === "globe") {
+    proj = d3.geoOrthographic().rotate([-18,-32]).fitExtent([[40,10],[w-40,h-10]], {type:"Sphere"});
+    const path0 = d3.geoPath(proj);
+    svg.innerHTML = `<defs><radialGradient id="shade" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#fff" stop-opacity=".0"/><stop offset=".75" stop-color="#1D4FA3" stop-opacity=".04"/><stop offset="1" stop-color="#1D4FA3" stop-opacity=".16"/></radialGradient></defs>
+      <path class="sphere" d="${path0({type:"Sphere"})}"/><path class="grat" d="${path0(d3.geoGraticule10())}"/>`;
+  } else if (view === "focus") {
+    proj = d3.geoAzimuthalEqualArea().rotate([-13,-45])
+      .fitExtent([[10,20],[w-10,250]], {type:"MultiPoint", coordinates:[[3,40],[23,40],[6,49],[21,49]]});
+  } else if (view === "world") {
+    proj = d3.geoEqualEarth().rotate([-10,0]).fitExtent([[4,4],[w-4,h-4]], {type:"Sphere"});
+  } else {
+    proj = d3.geoAzimuthalEqualArea().rotate([-14,-52])
+      .fitExtent([[0,0],[w,h]], {type:"MultiPoint", coordinates:[[-11,36],[33,35],[40,70],[-20,64],[24,71]]});
+  }
+  const path = d3.geoPath(proj);
+  for (const f of features) {
+    const d = path(f); if (!d) continue;
+    const p = document.createElementNS(ns, "path");
+    p.setAttribute("d", d);
+    p.setAttribute("fill", color(f.id));
+    if (f.id === sel) p.setAttribute("class","sel");
+    svg.appendChild(p);
+  }
+  if (view === "globe") {
+    const gl = document.createElementNS(ns, "path");
+    gl.setAttribute("class","glow"); gl.setAttribute("d", path({type:"Sphere"})); svg.appendChild(gl);
+  }
+  if (view === "europe" || view === "focus") {
+    const g = document.createElementNS(ns, "g"); g.setAttribute("class","dots");
+    for (const f of features) if (MICRO.includes(f.id)) {
+      const c = proj(d3.geoCentroid(f)); if (!c) continue;
+      const e = document.createElementNS(ns, "circle");
+      e.setAttribute("cx", c[0]); e.setAttribute("cy", c[1]); e.setAttribute("r", 4.5);
+      e.setAttribute("fill", MICRO_DEMO[f.id]); g.appendChild(e);
+    }
+    svg.appendChild(g);
+  }
+}
+document.querySelectorAll("svg.map").forEach(draw);
+
+// Bottom navigation
+const NAV = [
+  ["Мапа",'<path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path d="M9 4v14M15 6v14"/>'],
+  ["Путовање",'<path d="M3 17h18M6 17l-2-6 3-1 3 3 4-2-3-6 3-1 6 7 3-1a1.5 1.5 0 0 1 1 2.8L7 17"/>'],
+  ["Статистика",'<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>'],
+];
+const active = {s1:0,s2:0,s3:1,s5:2,s7:0};
+for (const [id, on] of Object.entries(active)) {
+  document.querySelector(`#${id} .nav`).innerHTML = NAV.map(([t, ic], i) =>
+    `<a class="${i===on?"on":""}"><span class="pill"><svg viewBox="0 0 24 24">${ic}</svg></span>${t}</a>`).join("");
+}
+
+// Continent rings
+const R = [["Европа",58,"var(--v3)"],["Азија",5,"var(--v3)"],["Африка",2,"var(--v3)"],["Америка",3,"var(--v3)"],["Океанија",0,"var(--v3)"]];
+document.getElementById("rings").innerHTML = R.map(([t,p,c]) => {
+  const C = 2*Math.PI*22;
+  return `<div class="ring"><svg viewBox="0 0 54 54"><circle cx="27" cy="27" r="22" fill="none" stroke="var(--chip)" stroke-width="6"/>
+    <circle cx="27" cy="27" r="22" fill="none" stroke="${c}" stroke-width="6" stroke-linecap="round" stroke-dasharray="${C*p/100} ${C}" transform="rotate(-90 27 27)"/>
+    <text x="27" y="31.5" text-anchor="middle">${p}%</text></svg>${t}</div>`;
+}).join("");
+</script>
+</body>
+</html>

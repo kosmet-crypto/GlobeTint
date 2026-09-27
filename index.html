@@ -1,0 +1,1843 @@
+<!doctype html>
+<html lang="sr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="globetint-native-api" content="1">
+<title>GlobeTint</title>
+<style>
+@font-face{font-family:Manrope;font-weight:200 800;font-display:swap;src:url(fonts/manrope-cyrillic-wght-normal.woff2) format("woff2");unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:Manrope;font-weight:200 800;font-display:swap;src:url(fonts/manrope-latin-ext-wght-normal.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:Manrope;font-weight:200 800;font-display:swap;src:url(fonts/manrope-latin-wght-normal.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+
+:root{
+  --v1:#A9D1FF;--v2:#5FA8F5;--v3:#2F7BE0;--v4:#1D4FA3;--lived:#22B573;--wish:#FF7F6B;--accent:#2F7BE0;
+  --hero1:#4C8DF0;--hero2:#2254B8;--hero3:#16336F;
+  --bg:#F4F6FA;--card:#FFFFFF;--ink:#11151C;--muted:#6B7382;--line:#E7EAF0;--land:#DDE2EA;--stroke:#FFFFFF;--chip:#EEF1F6;
+  --shadow:0 1px 2px rgba(17,21,28,.04),0 8px 24px rgba(17,21,28,.06);--scrim:rgba(10,14,22,.45);
+  --nav:72px;--safe-b:env(safe-area-inset-bottom,0px);
+  color-scheme:light;
+}
+:root[data-palette="rose"]{
+  --v1:#FFD0E2;--v2:#FF9CC3;--v3:#EE5C9D;--v4:#B8266C;--lived:#8A63F5;--wish:#FFB547;--accent:#E24C8D;
+  --hero1:#FF8DB8;--hero2:#D63C83;--hero3:#7E1A4E;
+}
+:root[data-theme="dark"]{
+  --bg:#0C1017;--card:#161B25;--ink:#F2F4F8;--muted:#8A93A5;--line:#232A37;--land:#283040;--stroke:#0C1017;--chip:#1E2430;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);--scrim:rgba(0,0,0,.6);
+  color-scheme:dark;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden}
+body{font-family:Manrope,system-ui,sans-serif;background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;font-feature-settings:"tnum" 1;user-select:none;-webkit-user-select:none}
+input,select,textarea,button{font:inherit;color:inherit}
+button{background:none;border:0;cursor:pointer}
+input,textarea{user-select:text;-webkit-user-select:text}
+
+#app-globetint{position:fixed;inset:0;display:flex;flex-direction:column}
+main{flex:1;position:relative;overflow:hidden}
+.tab{position:absolute;inset:0;display:none;flex-direction:column}
+.tab.on{display:flex}
+.scroll{flex:1;overflow-y:auto;padding-bottom:110px;-webkit-overflow-scrolling:touch}
+
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 20px 10px;padding-top:max(14px,env(safe-area-inset-top))}
+.brand{font-size:22px;font-weight:800;letter-spacing:-.5px;display:flex;align-items:center;gap:8px}
+.brand .dot{width:22px;height:22px;border-radius:50%;background:conic-gradient(from 200deg,var(--v2),var(--v4),var(--lived),var(--wish),var(--v2))}
+.h1{font-size:26px;font-weight:800;letter-spacing:-.6px}
+.btns{display:flex;gap:8px}
+.iconbtn{width:42px;height:42px;border-radius:14px;background:var(--card);box-shadow:var(--shadow);display:grid;place-items:center;flex:none}
+.iconbtn svg,.ico{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+
+.chips{display:flex;gap:8px;padding:0 20px 8px;overflow-x:auto;scrollbar-width:none;flex:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;padding:8px 14px;border-radius:999px;background:var(--chip);font-size:13px;font-weight:700;color:var(--muted);white-space:nowrap}
+.chip.on{background:var(--ink);color:var(--bg)}
+
+/* map */
+.mapwrap{flex:1;position:relative;overflow:hidden}
+#map{position:absolute;inset:0;width:100%;height:100%;touch-action:none;display:block}
+#map path{vector-effect:non-scaling-stroke;stroke-linejoin:round}
+#map .lands path{fill:var(--land);stroke:var(--stroke);stroke-width:.6}
+#map .lands path.v1{fill:var(--v1)}#map .lands path.v2{fill:var(--v2)}#map .lands path.v3{fill:var(--v3)}#map .lands path.v4{fill:var(--v4)}
+#map .lands path.lv{fill:var(--lived)}#map .lands path.ws{fill:var(--wish)}
+#map .lands path.dim{opacity:.35}
+#map .lands path.sel{stroke:var(--ink);stroke-width:2}
+#map .sphere{fill:var(--card);stroke:var(--line);stroke-width:1}
+#map .grat{fill:none;stroke:var(--line);stroke-width:.5}
+#map .glow{fill:url(#gshade);pointer-events:none}
+#map .dots circle.d{stroke:var(--stroke);stroke-width:1;fill:var(--land)}
+#map .dots circle.d.v1{fill:var(--v1)}#map .dots circle.d.v2{fill:var(--v2)}#map .dots circle.d.v3{fill:var(--v3)}#map .dots circle.d.v4{fill:var(--v4)}
+#map .dots circle.d.lv{fill:var(--lived)}#map .dots circle.d.ws{fill:var(--wish)}
+#map .dots circle.d.none{fill:var(--land);stroke:var(--muted);stroke-opacity:.5}
+#map .dots g.hide{display:none}
+#map .dots circle.hit{fill:transparent}
+#map .dots g.dim{opacity:.35}
+.modebtn{position:absolute;right:16px;top:8px;width:44px;height:44px;border-radius:15px;background:var(--card);box-shadow:var(--shadow);display:grid;place-items:center;z-index:2}
+
+.panel{position:absolute;left:0;right:0;bottom:0;background:var(--card);border-radius:28px 28px 0 0;box-shadow:0 -10px 40px rgba(17,21,28,.10);padding:8px 20px 16px;z-index:3}
+:root[data-theme="dark"] .panel{box-shadow:none;border-top:1px solid var(--line)}
+.grab{width:38px;height:5px;border-radius:3px;background:var(--line);margin:0 auto 12px}
+.grabzone{margin:-8px -20px 0;padding:8px 20px 0}
+.big{display:flex;align-items:flex-end;justify-content:space-between}
+.big .n{font-size:42px;font-weight:800;letter-spacing:-1.5px;line-height:1}
+.big .n small{font-size:19px;color:var(--muted);font-weight:700;letter-spacing:0}
+.big .pct{font-size:13px;color:var(--muted);font-weight:600;text-align:right}
+.big .pct b{display:block;font-size:26px;color:var(--accent);font-weight:800;letter-spacing:-.5px}
+.lbl{font-size:12px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.8px}
+.legend{display:flex;gap:14px;margin:12px 0 2px;font-size:12px;font-weight:600;color:var(--muted);flex-wrap:wrap}
+.legend span{display:flex;align-items:center;gap:6px}
+.legend i{width:10px;height:10px;border-radius:3px;display:block}
+.ramp{display:flex;gap:2px}.ramp i{width:7px}
+.bars{display:grid;gap:9px;margin-top:12px}
+.bar{display:grid;grid-template-columns:86px 1fr 50px;align-items:center;gap:10px;font-size:13px;font-weight:600}
+.bar .t{height:8px;border-radius:4px;background:var(--chip);overflow:hidden}
+.bar .t i{display:block;height:100%;border-radius:4px;background:linear-gradient(90deg,var(--v2),var(--v3))}
+.bar em{font-style:normal;color:var(--muted);text-align:right;font-size:12px}
+
+/* nav */
+.nav{flex:none;height:calc(var(--nav) + var(--safe-b));padding-bottom:var(--safe-b);background:var(--card);border-top:1px solid var(--line);display:flex;justify-content:space-around;align-items:center;z-index:5}
+.nav button{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;font-weight:700;color:var(--muted);width:96px}
+.nav button svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.nav .pill{padding:4px 18px;border-radius:14px;display:grid;place-items:center}
+.nav button.on{color:var(--ink)}.nav button.on .pill{background:var(--chip)}
+
+/* generic */
+.pad{padding:0 20px}
+.card{background:var(--card);border-radius:22px;box-shadow:var(--shadow)}
+.h4{display:flex;justify-content:space-between;align-items:baseline;margin:22px 0 8px}
+.h4 b{font-size:16px;font-weight:800}.h4 button{font-size:13px;color:var(--accent);font-weight:700}
+.muted{color:var(--muted)}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;height:52px;border-radius:17px;background:var(--accent);color:#fff;font-size:16px;font-weight:800;width:100%}
+.btn.sec{background:var(--chip);color:var(--ink)}
+.btn.danger{background:transparent;color:#E5484D}
+.btn:disabled{opacity:.4}
+.row{display:flex;align-items:center;gap:12px}
+.empty{text-align:center;padding:28px 10px;color:var(--muted);font-size:14px;font-weight:600;line-height:1.5}
+.flag{font-size:30px;line-height:1}
+
+/* hero (trip) */
+.hero{border-radius:26px;padding:20px;color:#fff;background:radial-gradient(120% 140% at 100% 0%,var(--hero1) 0%,var(--hero2) 45%,var(--hero3) 100%);box-shadow:0 14px 30px rgba(20,40,90,.25);position:relative;overflow:hidden}
+.hero:after{content:"";position:absolute;right:-40px;top:-40px;width:160px;height:160px;border-radius:50%;border:24px solid rgba(255,255,255,.07);pointer-events:none}
+.hero .hrow{display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:600;opacity:.9;gap:10px}
+.hero h3{font-size:20px;font-weight:800;margin:6px 0 14px;letter-spacing:-.3px}
+.hero .sum{font-size:38px;font-weight:800;letter-spacing:-1.2px;line-height:1}
+.hero .sum small{font-size:18px;font-weight:700;opacity:.8;letter-spacing:0}
+.hero .prog{height:8px;border-radius:4px;background:rgba(255,255,255,.2);margin:14px 0 8px;overflow:hidden}
+.hero .prog i{display:block;height:100%;background:#fff;border-radius:4px}
+.hero .prog.over i{background:#FFB4A8}
+.hero .meta{display:flex;justify-content:space-between;font-size:12px;font-weight:600;opacity:.9;gap:8px}
+.hero .pers{margin-top:10px;font-size:12px;font-weight:700;opacity:.85}
+.banner{display:flex;align-items:center;gap:12px;background:var(--card);box-shadow:var(--shadow);border-radius:18px;padding:12px 14px;margin-top:12px;font-size:13px;font-weight:700;width:100%;text-align:left}
+.banner .flag{font-size:26px}
+.banner div{flex:1;min-width:0}.banner div span{display:block;color:var(--muted);font-size:12px;font-weight:600;margin-top:1px}
+.banner b{background:var(--ink);color:var(--bg);font-size:12px;padding:8px 12px;border-radius:10px;flex:none}
+.cats{display:flex;height:10px;border-radius:5px;overflow:hidden;gap:2px;margin:18px 0 10px}
+.catleg{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;font-weight:600;color:var(--muted)}
+.catleg span{display:flex;align-items:center;gap:5px}.catleg i{width:8px;height:8px;border-radius:50%}
+.exp{display:flex;align-items:center;gap:12px;padding:10px 0;width:100%;text-align:left}
+.exp .em{width:42px;height:42px;border-radius:14px;background:var(--chip);display:grid;place-items:center;font-size:20px;flex:none}
+.exp div{flex:1;min-width:0}
+.exp strong{display:block;font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.exp span{font-size:12px;color:var(--muted);font-weight:600}
+.exp .amt{text-align:right;flex:none}
+.exp .amt strong{font-size:15px}
+.day{font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin:16px 0 2px;display:flex;justify-content:space-between}
+.tag{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.4px;color:var(--wish);background:color-mix(in srgb,var(--wish) 14%,transparent);padding:2px 6px;border-radius:6px;margin-left:6px;vertical-align:1px}
+.fab{position:absolute;right:20px;bottom:24px;width:62px;height:62px;border-radius:22px;background:var(--ink);color:var(--bg);display:grid;place-items:center;box-shadow:0 12px 26px rgba(17,21,28,.3);z-index:4}
+.fab svg{width:28px;height:28px;stroke:currentColor;stroke-width:2.2;fill:none;stroke-linecap:round}
+
+/* stats */
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tile{background:var(--card);border-radius:22px;padding:16px;box-shadow:var(--shadow);min-width:0}
+.tile .v{font-size:28px;font-weight:800;letter-spacing:-.8px;margin-top:6px;white-space:nowrap}
+.tile .v small{font-size:14px;color:var(--muted);font-weight:700;letter-spacing:0}
+.tile .s{font-size:12px;color:var(--muted);font-weight:600;margin-top:2px}
+.rings{display:flex;justify-content:space-between;background:var(--card);border-radius:22px;padding:16px 10px;box-shadow:var(--shadow);margin-top:10px}
+.ring{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:11px;font-weight:700;color:var(--muted);flex:1;min-width:0}
+.ring svg{width:54px;height:54px}
+.ring text{font:800 13px Manrope,sans-serif;fill:var(--ink)}
+.list{background:var(--card);border-radius:22px;padding:4px 16px;box-shadow:var(--shadow)}
+.li{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--line);width:100%;text-align:left}
+.li:first-child{border-top:0}
+.li .fl{font-size:18px;white-space:nowrap;min-width:30px;max-width:78px;overflow:hidden}
+.li div{flex:1;min-width:0}.li strong{font-size:14px;font-weight:700;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.li span{font-size:12px;color:var(--muted);font-weight:600}
+.li .amt{text-align:right;font-size:14px;font-weight:800;flex:none}
+.li .amt span{display:block}
+.li .sd{width:10px;height:10px;border-radius:50%;flex:none}
+.li.cur{position:relative}
+.remind{display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:18px;background:color-mix(in srgb,var(--wish) 12%,var(--card));margin-bottom:12px;font-size:13px;font-weight:700}
+.remind div{flex:1}
+.remind button{background:var(--ink);color:var(--bg);font-size:12px;font-weight:800;padding:8px 12px;border-radius:10px}
+
+/* layers: sheets and pages */
+#layer{position:fixed;inset:0;pointer-events:none;z-index:20}
+.scrim{position:absolute;inset:0;background:var(--scrim);opacity:0;transition:opacity .22s;pointer-events:auto}
+.sheet{position:absolute;left:0;right:0;bottom:0;max-height:92%;background:var(--card);border-radius:28px 28px 0 0;padding:8px 20px calc(20px + var(--safe-b));overflow-y:auto;transform:translateY(100%);transition:transform .26s cubic-bezier(.2,.8,.2,1);pointer-events:auto;box-shadow:0 -10px 40px rgba(0,0,0,.15)}
+.sheet.tall{height:92%}
+.closing *{pointer-events:none!important}
+.open .scrim{opacity:1}.open .sheet{transform:none}
+.page{position:absolute;inset:0;background:var(--bg);transform:translateX(100%);transition:transform .26s cubic-bezier(.2,.8,.2,1);pointer-events:auto;display:flex;flex-direction:column}
+.open .page{transform:none}
+.page .scroll{padding-bottom:40px}
+.back{display:flex;align-items:center;gap:6px}
+.stitle{font-size:20px;font-weight:800;letter-spacing:-.3px;margin:4px 0 14px}
+
+.ctitle{display:flex;align-items:center;gap:12px}
+.ctitle .flag{font-size:36px}
+.ctitle h3{font-size:22px;font-weight:800;letter-spacing:-.4px}
+.ctitle p{font-size:13px;color:var(--muted);font-weight:600}
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:4px;background:var(--chip);padding:4px;border-radius:14px}
+.seg button{font-size:12px;font-weight:700;text-align:center;padding:9px 2px;border-radius:10px;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:3px}
+.seg button i{width:8px;height:8px;border-radius:50%;display:block}
+.seg button.on{background:var(--card);color:var(--ink);box-shadow:var(--shadow)}
+.seg.row1 button{flex-direction:row;justify-content:center;padding:9px 6px}
+.visit{display:flex;align-items:center;gap:12px;padding:11px 0;border-top:1px solid var(--line);width:100%;text-align:left}
+.visit .num{width:32px;height:32px;border-radius:10px;display:grid;place-items:center;font-size:13px;font-weight:800;color:#fff;flex:none}
+.visit div{flex:1;min-width:0}
+.visit strong{display:block;font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.visit span{font-size:12px;color:var(--muted);font-weight:600}
+.visit .go{color:var(--muted);font-size:18px}
+.add{margin-top:10px;border:1.5px dashed var(--line);border-radius:14px;padding:12px;text-align:center;font-size:14px;font-weight:700;color:var(--accent);width:100%}
+.note{font-size:12px;color:var(--muted);font-weight:600;margin-top:10px;line-height:1.45}
+
+.field{display:block;margin-top:12px}
+.field>span{display:block;font-size:12px;font-weight:700;color:var(--muted);margin:0 0 6px 2px}
+.inp{width:100%;height:48px;border-radius:14px;border:1.5px solid var(--line);background:var(--bg);padding:0 14px;font-size:15px;font-weight:600;outline:none;appearance:none;-webkit-appearance:none}
+.inp:focus{border-color:var(--accent)}
+textarea.inp{height:76px;padding:12px 14px;resize:none}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.actions{display:grid;gap:8px;margin-top:18px}
+
+/* expense sheet */
+.where{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
+.where button,.where label{background:var(--chip);padding:7px 12px;border-radius:999px;font-size:13px;font-weight:700;position:relative;overflow:hidden}
+.where input[type=date]{position:absolute;inset:0;opacity:0;width:100%}
+.amount{text-align:center;margin:12px 0 0;font-size:50px;font-weight:800;letter-spacing:-2px;white-space:nowrap;overflow:hidden}
+.amount small{font-size:21px;color:var(--muted);letter-spacing:0;font-weight:700}
+.amount.zero{color:var(--muted)}
+.conv{text-align:center;font-size:14px;font-weight:700;color:var(--accent);display:block;margin:2px auto 0}
+.conv span{color:var(--muted);font-weight:600}
+.conv.warn{color:#E5484D}
+.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin:14px 0 12px}
+.grid button{display:flex;flex-direction:column;align-items:center;gap:4px;padding:9px 0 7px;border-radius:15px;background:var(--chip);font-size:10.5px;font-weight:700;color:var(--muted);text-align:center;line-height:1.15;min-width:0}
+.grid button em{font-style:normal;font-size:22px}
+.grid button.on{background:var(--ink);color:var(--bg)}
+.opts{display:flex;gap:8px;align-items:center}
+.mini{display:flex;background:var(--chip);border-radius:12px;padding:3px}
+.mini button{font-size:12px;font-weight:700;padding:7px 11px;border-radius:9px;color:var(--muted)}
+.mini button.on{background:var(--card);color:var(--ink);box-shadow:var(--shadow)}
+.sw{margin-left:auto;display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;color:var(--muted)}
+.sw i{width:42px;height:26px;border-radius:13px;background:var(--line);position:relative;transition:background .15s;flex:none}
+.sw i:after{content:"";position:absolute;left:3px;top:3px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2);transition:transform .15s}
+.sw.on i{background:var(--wish)}.sw.on i:after{transform:translateX(16px)}
+.keys{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:12px}
+.keys button{height:50px;border-radius:14px;display:grid;place-items:center;font-size:22px;font-weight:700;background:var(--bg)}
+.keys button:active{background:var(--chip)}
+.more{display:grid;gap:0;margin-top:10px}
+
+/* pick list */
+.search{position:relative;margin-bottom:8px}
+.search input{padding-left:42px}
+.search svg{position:absolute;left:14px;top:14px;width:20px;height:20px;stroke:var(--muted);fill:none;stroke-width:2}
+
+/* settings */
+.group{margin-top:18px}
+.group>.lbl{margin:0 0 8px 4px}
+.set{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 0;border-top:1px solid var(--line);font-size:14px;font-weight:700;width:100%;text-align:left}
+.set:first-child{border-top:0}
+.set .val{color:var(--muted);font-weight:600;font-size:13px;text-align:right}
+.set select{border:0;background:transparent;font-weight:700;color:var(--accent);text-align:right;max-width:55%;outline:none;font-size:14px}
+.set .seg{min-width:190px}
+.card>.rate:first-child{border-top:0}
+.rate{display:flex;align-items:center;gap:8px;padding:10px 0;border-top:1px solid var(--line);font-size:14px;font-weight:700}
+.rate input{width:110px;height:40px;border-radius:12px;border:1.5px solid var(--line);background:var(--bg);padding:0 10px;font-weight:700;text-align:right;outline:none}
+.rate .x{margin-left:auto;color:var(--muted);font-size:20px;width:32px;height:32px}
+
+/* dialog + toast */
+.dialog{position:absolute;left:24px;right:24px;top:50%;transform:translateY(-40%) scale(.96);opacity:0;background:var(--card);border-radius:24px;padding:22px 20px 16px;transition:all .2s;pointer-events:auto}
+.open .dialog{opacity:1;transform:translateY(-50%)}
+.dialog p{font-size:15px;font-weight:700;line-height:1.45}
+.dialog .dbtns{display:flex;gap:8px;margin-top:18px}
+.dialog .dbtns .btn{height:46px;font-size:15px}
+#toast{position:fixed;left:50%;bottom:calc(var(--nav) + var(--safe-b) + 18px);transform:translate(-50%,20px);background:var(--ink);color:var(--bg);padding:11px 16px;border-radius:14px;font-size:13px;font-weight:700;opacity:0;transition:all .2s;z-index:50;pointer-events:none;max-width:88%;text-align:center}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+
+.shareimg{width:100%;border-radius:18px;display:block;margin:4px 0 14px;box-shadow:var(--shadow)}
+</style>
+</head>
+<body>
+<div id="app-globetint">
+  <main>
+    <section class="tab on" id="tab-map">
+      <header class="top">
+        <div class="brand"><span class="dot"></span>GlobeTint</div>
+        <div class="btns">
+          <button class="iconbtn" data-act="openList" aria-label="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></button>
+          <button class="iconbtn" data-act="openSettings" aria-label="settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
+        </div>
+      </header>
+      <div class="chips" id="regionChips"></div>
+      <div class="mapwrap" id="mapwrap">
+        <svg id="map"></svg>
+        <button class="modebtn" data-act="toggleMode" id="modeBtn" aria-label="globe/map"></button>
+      </div>
+      <div class="panel" id="mapPanel"></div>
+    </section>
+
+    <section class="tab" id="tab-trip">
+      <div class="scroll" id="tripView"></div>
+      <button class="fab" data-act="addExpense" id="fab" aria-label="+"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
+    </section>
+
+    <section class="tab" id="tab-stats">
+      <div class="scroll" id="statsView"></div>
+    </section>
+  </main>
+  <nav class="nav" id="nav"></nav>
+  <div id="layer"></div>
+  <div id="toast"></div>
+  <input type="file" id="importFile" accept="application/json,.json,text/plain" hidden>
+</div>
+
+<script src="vendor/d3-array.min.js"></script>
+<script src="vendor/d3-geo.min.js"></script>
+<script src="vendor/topojson-client.min.js"></script>
+<script src="data/world.js"></script>
+<script>
+"use strict";
+/* =====================================================================
+   GlobeTint — travel map and trip expenses. Everything runs offline;
+   data lives in IndexedDB on the phone (backup/restore as a JSON file).
+   ===================================================================== */
+
+const AND = window.GlobeTintAndroid || null;   // Android bridge (see MainActivity.java)
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+
+/* ---------------- Country data ---------------- */
+const D = window.GT_DATA;
+const META = D.meta;                         // iso2 -> [continent, counted(1/0), currency, English name]
+const CONTS = ["EU", "AS", "AF", "AM", "OC"];
+const COUNTED = Object.keys(META).filter(c => META[c][1]);
+const TOTAL = { W: COUNTED.length };
+for (const c of CONTS) TOTAL[c] = COUNTED.filter(i => META[i][0] === c).length;
+const FEATURES = topojson.feature(D.topo, D.topo.objects.countries).features;
+const FEAT = new Map(FEATURES.filter(f => f.id).map(f => [f.id, f]));
+
+// Countries too small to tap on the map get a dot.
+const DOTS = [];
+for (const f of FEATURES) {
+  if (!f.id || d3.geoArea(f) > 4e-5) continue;
+  let g = f.geometry;
+  if (g.type === "MultiPolygon") {
+    const best = g.coordinates.map(c => ({ type: "Polygon", coordinates: c })).sort((a, b) => d3.geoArea(b) - d3.geoArea(a))[0];
+    g = best;
+  }
+  DOTS.push({ id: f.id, c: d3.geoCentroid(g) });
+}
+for (const [id, c] of Object.entries(D.points)) DOTS.push({ id, c });
+
+const REGIONS = {
+  EU: { c: [15, 52], k: 2.4, box: [[-11, 36], [33, 35], [45, 39], [50, 42], [40, 68], [-22, 64], [24, 71]] },
+  AS: { c: [92, 28], k: 1.35, box: [[34, 30], [146, 44], [125, -10], [95, -10], [60, 55], [140, 55], [46, 13]] },
+  AF: { c: [18, 2], k: 1.55, box: [[-18, 34], [52, 12], [20, -35], [-17, 15], [33, 32]] },
+  AM: { c: [-80, 12], k: 1.0, box: [[-168, 66], [-52, 48], [-35, -8], [-72, -55], [-118, 32]] },
+  OC: { c: [160, -18], k: 1.6, box: [[113, -22], [153, -28], [178, -47], [-172, -14], [172, 7], [134, 7]] },
+};
+
+const CATS = [
+  ["food", "🍽️", "#FFB547"], ["fast", "🍔", "#FF8A3D"], ["grocery", "🛒", "#A17BF5"], ["stay", "🏨", "#6C8CFF"],
+  ["transport", "🚆", "#22B573"], ["culture", "🏛️", "#FF6F91"], ["souvenir", "🎁", "#F2C94C"], ["clothes", "👕", "#3CC6D6"],
+  ["tech", "📱", "#5B6B85"], ["other", "✨", "#9AA3B2"],
+];
+const CAT = Object.fromEntries(CATS.map(([k, e, c]) => [k, { e, c }]));
+const PERSONAL_CATS = new Set(["clothes", "tech"]);
+
+/* ---------------- Translations ---------------- */
+const T = {
+  sr: {
+    "nav.map": "Мапа", "nav.trip": "Путовање", "nav.stats": "Статистика",
+    "r.W": "Свет", "r.EU": "Европа", "r.AS": "Азија", "r.AF": "Африка", "r.AM": "Америка", "r.OC": "Океанија",
+    "st.visited": "Посећено", "st.lived": "Дом", "st.wish": "Жеља", "st.none": "Ништа",
+    "p.visited": "Посећене земље", "p.ofWorld": "света", "p.ofCont": "континента",
+    "p.more": "Дом {a} · Жеља {b}",
+    "c.territory": "Територија · не улази у проценат",
+    "pl.visits": { one: "{n} посета", few: "{n} посете", other: "{n} посета" },
+    "pl.days": { one: "{n} дан", few: "{n} дана", other: "{n} дана" },
+    "pl.countries": { one: "{n} земља", few: "{n} земље", other: "{n} земаља" },
+    "pl.continents": { one: "{n} континент", few: "{n} континента", other: "{n} континената" },
+    "pl.trips": { one: "{n} путовање", few: "{n} путовања", other: "{n} путовања" },
+    "c.addVisit": "+ Додај посету", "c.noVisits": "Још нема уписаних посета. Датуми и места су опциони.",
+    "v.title": "Посета", "v.from": "Од", "v.to": "До", "v.place": "Места", "v.placePh": "нпр. Рим, Фиренца", "v.note": "Белешка",
+    "v.delete": "Обриши посету", "v.fromTrip": "Са путовања „{name}“", "v.noDates": "Без датума",
+    "q.removeVisits": "Уписане посете ове земље ће бити обрисане. Наставити?",
+    "b.cancel": "Откажи", "b.ok": "У реду", "b.save": "Сачувај", "b.delete": "Обриши", "b.back": "Назад", "b.yes": "Да",
+    "l.title": "Земље", "l.ph": "Пронађи земљу", "l.all": "Све", "l.terr": "Територије", "l.none": "Ништа није пронађено",
+    "t.title": "Путовање", "t.none": "Нема активног путовања",
+    "t.noneSub": "Започни путовање и уписуј трошкове у локалној валути. GlobeTint их одмах претвара у {cur}.",
+    "t.start": "Започни путовање", "t.past": "Ранија путовања", "t.day": "Дан {d} / {n}", "t.starts": "Почиње за {days}",
+    "t.ended": "Завршено", "t.budget": "Буџет {v}", "t.noBudget": "Без буџета", "t.perDay": "≈ {v} / дан",
+    "t.personal": "Личне куповине: {v}", "t.today": "Данас", "t.yesterday": "Јуче",
+    "t.noExp": "Још нема трошкова. Додај први на дугме +.",
+    "t.here": "Твоја локација: {c}", "t.switch": "Пребаци", "t.now": "Тренутно: {c}", "t.pick": "Изабери земљу у којој си",
+    "t.edit": "Измени путовање", "t.end": "Заврши путовање", "t.del": "Обриши путовање", "t.resume": "Настави ово путовање",
+    "t.delQ": "Обрисати путовање и све његове трошкове?", "t.new": "Ново путовање",
+    "t.name": "Назив", "t.namePh": "нпр. Лето у Грчкој", "t.budgetL": "Буџет у {cur} (опционо)",
+    "t.defName": "Путовање", "t.rate": "1 {a} = {r} {b}",
+    "e.new": "Нови трошак", "e.edit": "Измени трошак",
+    "e.noRate": "Нема курса за {cur}. Упиши износ у {home} испод или ручни курс у подешавањима.",
+    "e.homeAmt": "Износ у {cur}", "e.homeHint": "нпр. колико је банка стварно скинула",
+    "e.card": "Картица", "e.cash": "Готовина", "e.personal": "Лична куповина", "e.note": "Белешка (опционо)",
+    "e.delete": "Обриши трошак", "e.tag": "ЛИЧНО", "e.rateOf": "курс од {date}", "e.more": "Износ у {cur}, белешка",
+    "cat.food": "Ресторан", "cat.fast": "Брза храна", "cat.grocery": "Намирнице", "cat.stay": "Смештај", "cat.transport": "Превоз",
+    "cat.culture": "Музеји", "cat.souvenir": "Сувенири", "cat.clothes": "Одећа", "cat.tech": "Техника", "cat.other": "Остало",
+    "s.title": "Статистика", "s.countries": "Земље", "s.conts": "Континенти", "s.trips": "Путовања", "s.spent": "Потрошено",
+    "s.year": "+{n} ове године", "s.missing": "фали: {list}", "s.allConts": "сви обиђени", "s.onRoad": "{days} на путу",
+    "s.noPersonal": "без личних куповина", "s.noTrips": "Још нема путовања.",
+    "s.backupNever": "Бекап још није направљен", "s.backupOld": "Последњи бекап пре {days}", "s.backupBtn": "Сачувај",
+    "sh.title": "Слика за дељење", "sh.head": "Мој свет", "sh.pct": "{p} обиђено",
+    "sh.c": "Земље", "sh.d": "Дани", "sh.v": "Посете", "sh.share": "Подели", "sh.save": "Сачувај слику",
+    "g.title": "Подешавања", "g.general": "Опште", "g.lang": "Језик", "g.langAuto": "Као на телефону",
+    "g.theme": "Тема", "g.sys": "Систем", "g.light": "Светла", "g.dark": "Тамна",
+    "g.palette": "Боје", "g.blue": "Плава", "g.rose": "Роза", "g.home": "Матична валута", "g.mapMode": "Свет",
+    "g.globe": "Глобус", "g.flat": "Мапа",
+    "g.rates": "Курсеви", "g.ratesAt": "Ажурирано {date}", "g.ratesNever": "Курсеви још нису преузети", "g.refresh": "Освежи",
+    "g.manual": "Ручни курсеви", "g.manualHint": "Имају предност над аутоматским. Корисно у мењачници или без интернета.",
+    "g.add": "Додај", "g.data": "Подаци", "g.export": "Сачувај бекап", "g.import": "Врати из бекапа",
+    "g.lastBackup": "Последњи бекап: {date}", "g.wipe": "Обриши све податке",
+    "g.wipeQ": "Трајно обрисати све земље, путовања и трошкове?", "g.about": "О апликацији", "g.version": "Верзија",
+    "g.update": "Провери ажурирања", "g.importQ": "Заменити тренутне податке подацима из бекапа?",
+    "g.importOk": "Подаци су враћени", "g.importBad": "Ово није GlobeTint бекап", "g.saved": "Бекап је сачуван",
+    "x.ratesOk": "Курсеви су ажурирани", "x.ratesFail": "Курсеви нису преузети. Има ли интернета?",
+    "x.saved": "Сачувано", "x.imgSaved": "Слика је сачувана",
+  },
+  en: {
+    "nav.map": "Map", "nav.trip": "Trip", "nav.stats": "Stats",
+    "r.W": "World", "r.EU": "Europe", "r.AS": "Asia", "r.AF": "Africa", "r.AM": "America", "r.OC": "Oceania",
+    "st.visited": "Visited", "st.lived": "Home", "st.wish": "Wish", "st.none": "None",
+    "p.visited": "Countries visited", "p.ofWorld": "of the world", "p.ofCont": "of the continent",
+    "p.more": "Home {a} · Wish {b}",
+    "c.territory": "Territory · not counted in the percentage",
+    "pl.visits": { one: "{n} visit", other: "{n} visits" },
+    "pl.days": { one: "{n} day", other: "{n} days" },
+    "pl.countries": { one: "{n} country", other: "{n} countries" },
+    "pl.continents": { one: "{n} continent", other: "{n} continents" },
+    "pl.trips": { one: "{n} trip", other: "{n} trips" },
+    "c.addVisit": "+ Add visit", "c.noVisits": "No visits yet. Dates and places are optional.",
+    "v.title": "Visit", "v.from": "From", "v.to": "To", "v.place": "Places", "v.placePh": "e.g. Rome, Florence", "v.note": "Note",
+    "v.delete": "Delete visit", "v.fromTrip": "From the trip “{name}”", "v.noDates": "No dates",
+    "q.removeVisits": "The visits recorded for this country will be deleted. Continue?",
+    "b.cancel": "Cancel", "b.ok": "OK", "b.save": "Save", "b.delete": "Delete", "b.back": "Back", "b.yes": "Yes",
+    "l.title": "Countries", "l.ph": "Find a country", "l.all": "All", "l.terr": "Territories", "l.none": "Nothing found",
+    "t.title": "Trip", "t.none": "No active trip",
+    "t.noneSub": "Start a trip and log expenses in the local currency. GlobeTint converts them to {cur} right away.",
+    "t.start": "Start a trip", "t.past": "Earlier trips", "t.day": "Day {d} / {n}", "t.starts": "Starts in {days}",
+    "t.ended": "Finished", "t.budget": "Budget {v}", "t.noBudget": "No budget", "t.perDay": "≈ {v} / day",
+    "t.personal": "Personal purchases: {v}", "t.today": "Today", "t.yesterday": "Yesterday",
+    "t.noExp": "No expenses yet. Add the first one with the + button.",
+    "t.here": "Your location: {c}", "t.switch": "Switch", "t.now": "Now: {c}", "t.pick": "Choose the country you are in",
+    "t.edit": "Edit trip", "t.end": "Finish trip", "t.del": "Delete trip", "t.resume": "Continue this trip",
+    "t.delQ": "Delete this trip and all its expenses?", "t.new": "New trip",
+    "t.name": "Name", "t.namePh": "e.g. Summer in Greece", "t.budgetL": "Budget in {cur} (optional)",
+    "t.defName": "Trip", "t.rate": "1 {a} = {r} {b}",
+    "e.new": "New expense", "e.edit": "Edit expense",
+    "e.noRate": "No rate for {cur}. Enter the amount in {home} below, or a manual rate in settings.",
+    "e.homeAmt": "Amount in {cur}", "e.homeHint": "e.g. what the bank actually charged",
+    "e.card": "Card", "e.cash": "Cash", "e.personal": "Personal purchase", "e.note": "Note (optional)",
+    "e.delete": "Delete expense", "e.tag": "PERSONAL", "e.rateOf": "rate from {date}", "e.more": "Amount in {cur}, note",
+    "cat.food": "Restaurant", "cat.fast": "Fast food", "cat.grocery": "Groceries", "cat.stay": "Lodging", "cat.transport": "Transport",
+    "cat.culture": "Museums", "cat.souvenir": "Souvenirs", "cat.clothes": "Clothes", "cat.tech": "Tech", "cat.other": "Other",
+    "s.title": "Stats", "s.countries": "Countries", "s.conts": "Continents", "s.trips": "Trips", "s.spent": "Spent",
+    "s.year": "+{n} this year", "s.missing": "missing: {list}", "s.allConts": "all visited", "s.onRoad": "{days} on the road",
+    "s.noPersonal": "excluding personal purchases", "s.noTrips": "No trips yet.",
+    "s.backupNever": "No backup yet", "s.backupOld": "Last backup {days} ago", "s.backupBtn": "Save",
+    "sh.title": "Image to share", "sh.head": "My world", "sh.pct": "{p} explored",
+    "sh.c": "Countries", "sh.d": "Days", "sh.v": "Visits", "sh.share": "Share", "sh.save": "Save image",
+    "g.title": "Settings", "g.general": "General", "g.lang": "Language", "g.langAuto": "Same as phone",
+    "g.theme": "Theme", "g.sys": "System", "g.light": "Light", "g.dark": "Dark",
+    "g.palette": "Colours", "g.blue": "Blue", "g.rose": "Rose", "g.home": "Home currency", "g.mapMode": "World",
+    "g.globe": "Globe", "g.flat": "Map",
+    "g.rates": "Exchange rates", "g.ratesAt": "Updated {date}", "g.ratesNever": "Rates not downloaded yet", "g.refresh": "Refresh",
+    "g.manual": "Manual rates", "g.manualHint": "They take priority over automatic rates. Handy at the exchange office or offline.",
+    "g.add": "Add", "g.data": "Data", "g.export": "Save backup", "g.import": "Restore from backup",
+    "g.lastBackup": "Last backup: {date}", "g.wipe": "Delete all data",
+    "g.wipeQ": "Permanently delete all countries, trips and expenses?", "g.about": "About", "g.version": "Version",
+    "g.update": "Check for updates", "g.importQ": "Replace the current data with the backup?",
+    "g.importOk": "Data restored", "g.importBad": "This is not a GlobeTint backup", "g.saved": "Backup saved",
+    "x.ratesOk": "Exchange rates updated", "x.ratesFail": "Could not download rates. Are you online?",
+    "x.saved": "Saved", "x.imgSaved": "Image saved",
+  },
+  nb: {
+    "nav.map": "Kart", "nav.trip": "Reise", "nav.stats": "Statistikk",
+    "r.W": "Verden", "r.EU": "Europa", "r.AS": "Asia", "r.AF": "Afrika", "r.AM": "Amerika", "r.OC": "Oseania",
+    "st.visited": "Besøkt", "st.lived": "Hjem", "st.wish": "Ønske", "st.none": "Ingen",
+    "p.visited": "Besøkte land", "p.ofWorld": "av verden", "p.ofCont": "av kontinentet",
+    "p.more": "Hjem {a} · Ønske {b}",
+    "c.territory": "Territorium · telles ikke i prosenten",
+    "pl.visits": { one: "{n} besøk", other: "{n} besøk" },
+    "pl.days": { one: "{n} dag", other: "{n} dager" },
+    "pl.countries": { one: "{n} land", other: "{n} land" },
+    "pl.continents": { one: "{n} kontinent", other: "{n} kontinenter" },
+    "pl.trips": { one: "{n} reise", other: "{n} reiser" },
+    "c.addVisit": "+ Legg til besøk", "c.noVisits": "Ingen besøk registrert ennå. Datoer og steder er valgfrie.",
+    "v.title": "Besøk", "v.from": "Fra", "v.to": "Til", "v.place": "Steder", "v.placePh": "f.eks. Roma, Firenze", "v.note": "Notat",
+    "v.delete": "Slett besøk", "v.fromTrip": "Fra reisen «{name}»", "v.noDates": "Uten datoer",
+    "q.removeVisits": "Besøkene som er registrert for dette landet blir slettet. Fortsette?",
+    "b.cancel": "Avbryt", "b.ok": "OK", "b.save": "Lagre", "b.delete": "Slett", "b.back": "Tilbake", "b.yes": "Ja",
+    "l.title": "Land", "l.ph": "Finn et land", "l.all": "Alle", "l.terr": "Territorier", "l.none": "Fant ingenting",
+    "t.title": "Reise", "t.none": "Ingen aktiv reise",
+    "t.noneSub": "Start en reise og før utgifter i lokal valuta. GlobeTint regner dem straks om til {cur}.",
+    "t.start": "Start en reise", "t.past": "Tidligere reiser", "t.day": "Dag {d} / {n}", "t.starts": "Starter om {days}",
+    "t.ended": "Avsluttet", "t.budget": "Budsjett {v}", "t.noBudget": "Uten budsjett", "t.perDay": "≈ {v} / dag",
+    "t.personal": "Personlige kjøp: {v}", "t.today": "I dag", "t.yesterday": "I går",
+    "t.noExp": "Ingen utgifter ennå. Legg til den første med +-knappen.",
+    "t.here": "Din posisjon: {c}", "t.switch": "Bytt", "t.now": "Nå: {c}", "t.pick": "Velg landet du er i",
+    "t.edit": "Endre reise", "t.end": "Avslutt reise", "t.del": "Slett reise", "t.resume": "Fortsett denne reisen",
+    "t.delQ": "Slette reisen og alle utgiftene?", "t.new": "Ny reise",
+    "t.name": "Navn", "t.namePh": "f.eks. Sommer i Hellas", "t.budgetL": "Budsjett i {cur} (valgfritt)",
+    "t.defName": "Reise", "t.rate": "1 {a} = {r} {b}",
+    "e.new": "Ny utgift", "e.edit": "Endre utgift",
+    "e.noRate": "Ingen kurs for {cur}. Skriv beløpet i {home} nedenfor, eller en manuell kurs i innstillingene.",
+    "e.homeAmt": "Beløp i {cur}", "e.homeHint": "f.eks. det banken faktisk trakk",
+    "e.card": "Kort", "e.cash": "Kontant", "e.personal": "Personlig kjøp", "e.note": "Notat (valgfritt)",
+    "e.delete": "Slett utgift", "e.tag": "PERSONLIG", "e.rateOf": "kurs fra {date}", "e.more": "Beløp i {cur}, notat",
+    "cat.food": "Restaurant", "cat.fast": "Gatekjøkken", "cat.grocery": "Dagligvarer", "cat.stay": "Overnatting", "cat.transport": "Transport",
+    "cat.culture": "Museer", "cat.souvenir": "Suvenirer", "cat.clothes": "Klær", "cat.tech": "Elektronikk", "cat.other": "Annet",
+    "s.title": "Statistikk", "s.countries": "Land", "s.conts": "Kontinenter", "s.trips": "Reiser", "s.spent": "Brukt",
+    "s.year": "+{n} i år", "s.missing": "mangler: {list}", "s.allConts": "alle besøkt", "s.onRoad": "{days} på reise",
+    "s.noPersonal": "uten personlige kjøp", "s.noTrips": "Ingen reiser ennå.",
+    "s.backupNever": "Ingen sikkerhetskopi ennå", "s.backupOld": "Siste sikkerhetskopi for {days} siden", "s.backupBtn": "Lagre",
+    "sh.title": "Bilde for deling", "sh.head": "Min verden", "sh.pct": "{p} utforsket",
+    "sh.c": "Land", "sh.d": "Dager", "sh.v": "Besøk", "sh.share": "Del", "sh.save": "Lagre bilde",
+    "g.title": "Innstillinger", "g.general": "Generelt", "g.lang": "Språk", "g.langAuto": "Som telefonen",
+    "g.theme": "Tema", "g.sys": "System", "g.light": "Lyst", "g.dark": "Mørkt",
+    "g.palette": "Farger", "g.blue": "Blå", "g.rose": "Rosa", "g.home": "Hjemmevaluta", "g.mapMode": "Verden",
+    "g.globe": "Globus", "g.flat": "Kart",
+    "g.rates": "Valutakurser", "g.ratesAt": "Oppdatert {date}", "g.ratesNever": "Kursene er ikke hentet ennå", "g.refresh": "Oppdater",
+    "g.manual": "Manuelle kurser", "g.manualHint": "Går foran de automatiske. Nyttig på vekslingskontoret eller uten nett.",
+    "g.add": "Legg til", "g.data": "Data", "g.export": "Lagre sikkerhetskopi", "g.import": "Gjenopprett fra sikkerhetskopi",
+    "g.lastBackup": "Siste sikkerhetskopi: {date}", "g.wipe": "Slett alle data",
+    "g.wipeQ": "Slette alle land, reiser og utgifter permanent?", "g.about": "Om appen", "g.version": "Versjon",
+    "g.update": "Se etter oppdateringer", "g.importQ": "Erstatte dataene med sikkerhetskopien?",
+    "g.importOk": "Data gjenopprettet", "g.importBad": "Dette er ikke en GlobeTint-sikkerhetskopi", "g.saved": "Sikkerhetskopi lagret",
+    "x.ratesOk": "Valutakursene er oppdatert", "x.ratesFail": "Kunne ikke hente kurser. Er du på nett?",
+    "x.saved": "Lagret", "x.imgSaved": "Bildet er lagret",
+  },
+};
+const LOCALES = { sr: "sr-Cyrl-RS", en: "en-GB", nb: "nb-NO" };
+// Country names where the phone's built-in names are long or not what we want.
+const NAME_FIX = {
+  sr: { US: "САД", CD: "ДР Конго", CG: "Конго", PS: "Палестина", HK: "Хонгконг", MO: "Макао", CI: "Обала Слоноваче",
+        MM: "Мјанмар", SZ: "Есватини", TL: "Источни Тимор", VA: "Ватикан", TW: "Тајван", CX: "Божићно Острво",
+        TF: "Француске јужне територије", FM: "Микронезија", AX: "Оландска Острва", KN: "Сент Китс и Невис" },
+  nb: { PS: "Palestina", CD: "DR Kongo", CG: "Kongo-Brazzaville", HK: "Hongkong", MO: "Macao", US: "USA",
+        CI: "Elfenbenskysten", MM: "Myanmar", TW: "Taiwan", VA: "Vatikanstaten" },
+};
+
+let LANG = "en";
+function detectLang() {
+  const l = (navigator.languages && navigator.languages[0] || navigator.language || "en").toLowerCase();
+  if (l.startsWith("sr")) return "sr";
+  if (l.startsWith("nb") || l.startsWith("nn") || l.startsWith("no")) return "nb";
+  return "en";
+}
+function t(key, vars) {
+  let s = T[LANG][key] ?? T.en[key] ?? key;
+  if (typeof s === "object") s = s.other;
+  return vars ? s.replace(/\{(\w+)\}/g, (_, k) => vars[k] ?? "") : s;
+}
+let PLURAL = new Intl.PluralRules("en");
+function tn(key, n) {
+  const forms = T[LANG][key] || T.en[key];
+  const s = forms[PLURAL.select(n)] || forms.other;
+  return s.replace("{n}", fmtNum(n));
+}
+let regionNames = null, currencyNames = null;
+function cname(iso) {
+  if (LANG === "en") return META[iso]?.[3] || iso;
+  const fix = NAME_FIX[LANG]?.[iso];
+  if (fix) return fix;
+  try {
+    const n = regionNames.of(iso);
+    if (n && n !== iso) return n;
+  } catch (e) {}
+  return META[iso]?.[3] || iso;
+}
+function curName(code) {
+  try { return currencyNames.of(code); } catch (e) { return code; }
+}
+const flag = iso => iso && /^[A-Z]{2}$/.test(iso) ? String.fromCodePoint(...[...iso].map(c => 0x1F1A5 + c.charCodeAt(0))) : "🏳️";
+
+/* ---------------- Formatting ---------------- */
+let NF0, NF2, DFs, DFl;
+function setLocale() {
+  const loc = LOCALES[LANG];
+  PLURAL = new Intl.PluralRules(loc);
+  NF0 = new Intl.NumberFormat(loc, { maximumFractionDigits: 0 });
+  NF2 = new Intl.NumberFormat(loc, { maximumFractionDigits: 2 });
+  DFs = new Intl.DateTimeFormat(loc, { day: "numeric", month: "short" });
+  DFl = new Intl.DateTimeFormat(loc, { day: "numeric", month: "short", year: "numeric" });
+  try { regionNames = new Intl.DisplayNames([loc], { type: "region" }); } catch (e) { regionNames = null; }
+  try { currencyNames = new Intl.DisplayNames([loc], { type: "currency" }); } catch (e) { currencyNames = null; }
+  document.documentElement.lang = LANG;
+}
+const fmtNum = n => NF0.format(n);
+const fmtAmt = n => (Math.abs(n) >= 100 ? NF0 : NF2).format(n);
+const fmtMoney = (n, cur) => fmtAmt(n) + " " + cur;
+function fmtRate(r) {
+  if (!r) return "–";
+  const d = r >= 100 ? 0 : r >= 1 ? 2 : r >= 0.01 ? 4 : 6;
+  return new Intl.NumberFormat(LOCALES[LANG], { maximumFractionDigits: d }).format(r);
+}
+const pd = s => { const [y, m, d] = s.split("-").map(Number); return new Date(y, m - 1, d); };
+const iso = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+const today = () => iso(new Date());
+const dayDiff = (a, b) => Math.round((pd(b) - pd(a)) / 864e5);
+function fmtDate(s, withYear) { return s ? (withYear ? DFl : DFs).format(pd(s)) : ""; }
+function fmtRange(a, b) {
+  if (!a && !b) return t("v.noDates");
+  if (!b || a === b) return fmtDate(a || b, true);
+  if (!a) return fmtDate(b, true);
+  const sameYear = a.slice(0, 4) === b.slice(0, 4);
+  return `${fmtDate(a, !sameYear)} – ${fmtDate(b, true)}`;
+}
+
+/* ---------------- Storage ---------------- */
+const DB = {
+  db: null,
+  open() {
+    return new Promise((res) => {
+      try {
+        const r = indexedDB.open("globetint", 1);
+        r.onupgradeneeded = () => r.result.createObjectStore("kv");
+        r.onsuccess = () => { this.db = r.result; res(); };
+        r.onerror = () => res();
+      } catch (e) { res(); }
+    });
+  },
+  get(k) {
+    if (!this.db) return Promise.resolve(JSON.parse(localStorage.getItem("gt:" + k) || "null"));
+    return new Promise(res => {
+      const q = this.db.transaction("kv").objectStore("kv").get(k);
+      q.onsuccess = () => res(q.result ?? null);
+      q.onerror = () => res(null);
+    });
+  },
+  set(k, v) {
+    if (!this.db) { localStorage.setItem("gt:" + k, JSON.stringify(v)); return Promise.resolve(); }
+    return new Promise(res => {
+      const tx = this.db.transaction("kv", "readwrite");
+      tx.objectStore("kv").put(v, k);
+      tx.oncomplete = () => res();
+      tx.onerror = () => res();
+    });
+  },
+};
+
+function guessHome() {
+  const l = navigator.language || "";
+  const region = (l.split("-")[1] || "").toUpperCase();
+  if (META[region]?.[2]) return META[region][2];
+  if (l.startsWith("sr")) return "RSD";
+  if (l.startsWith("nb") || l.startsWith("no")) return "NOK";
+  return "EUR";
+}
+function blank() {
+  return {
+    v: 1, countries: {}, trips: [], expenses: [],
+    settings: { lang: "auto", theme: "system", palette: "blue", home: guessHome(), mapMode: "globe",
+                panel: true, currentTrip: null, lastBackup: 0, manual: {}, lastCountry: null },
+    rates: null,
+  };
+}
+function normalize(s) {
+  const b = blank();
+  s = s && typeof s === "object" ? s : {};
+  return {
+    v: 1,
+    countries: s.countries && typeof s.countries === "object" ? s.countries : {},
+    trips: Array.isArray(s.trips) ? s.trips : [],
+    expenses: Array.isArray(s.expenses) ? s.expenses : [],
+    settings: { ...b.settings, ...(s.settings || {}) },
+    rates: s.rates || null,
+  };
+}
+let S = blank();
+let saveTimer = 0;
+function save() {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(flush, 250);
+}
+function flush() { clearTimeout(saveTimer); return DB.set("state", S); }
+addEventListener("pagehide", flush);
+document.addEventListener("visibilitychange", () => { if (document.hidden) flush(); });
+
+/* ---------------- Country status ---------------- */
+const cget = iso => S.countries[iso] || { status: null, visits: [] };
+function cset(iso) { return S.countries[iso] || (S.countries[iso] = { status: null, visits: [] }); }
+const isVisited = iso => { const s = S.countries[iso]?.status; return s === "visited" || s === "lived"; };
+function shade(iso) {
+  const c = S.countries[iso];
+  if (!c || !c.status) return "";
+  if (c.status === "lived") return "lv";
+  if (c.status === "wish") return "ws";
+  const n = Math.max(1, c.visits?.length || 0);
+  return n >= 5 ? "v4" : n >= 3 ? "v3" : n === 2 ? "v2" : "v1";
+}
+function counts(region) {
+  const ids = region === "W" ? COUNTED : COUNTED.filter(i => META[i][0] === region);
+  let v = 0, lived = 0, wish = 0;
+  for (const i of ids) {
+    const s = S.countries[i]?.status;
+    if (s === "visited" || s === "lived") v++;
+    if (s === "lived") lived++;
+    if (s === "wish") wish++;
+  }
+  return { v, lived, wish, total: ids.length, pct: ids.length ? v / ids.length * 100 : 0 };
+}
+const fmtPct = p => new Intl.NumberFormat(LOCALES[LANG], { maximumFractionDigits: p > 0 && p < 10 ? 1 : 0 }).format(p) + " %";
+
+/* ---------------- Exchange rates ----------------
+   Every expense stores the rate used when it was saved, so later rate
+   changes never change old totals. Rates: manual (settings) first, then
+   the downloaded table (units per 1 base currency). */
+function rateOf(from, to) {
+  if (from === to) return 1;
+  const m = S.settings.manual[from + "/" + to];
+  if (m > 0) return m;
+  const back = S.settings.manual[to + "/" + from];
+  if (back > 0) return 1 / back;
+  const R = S.rates?.rates;
+  if (R) {
+    const a = from === S.rates.base ? 1 : R[from], b = to === S.rates.base ? 1 : R[to];
+    if (a > 0 && b > 0) return b / a;
+  }
+  return null;
+}
+async function fetchRates(manual) {
+  const home = S.settings.home;
+  const fresh = S.rates && S.rates.base === home && Date.now() - S.rates.fetched < 6 * 36e5;
+  if (fresh && !manual) return;
+  let table = null, date = null;
+  try {
+    const r = await fetch(`https://open.er-api.com/v6/latest/${home}`, { cache: "no-store" });
+    const j = await r.json();
+    if (j.result === "success" && j.rates) { table = j.rates; date = new Date(j.time_last_update_unix * 1000).toISOString().slice(0, 10); }
+  } catch (e) {}
+  if (!table) {
+    try {
+      const code = home.toLowerCase();
+      const r = await fetch(`https://latest.currency-api.pages.dev/v1/currencies/${code}.json`, { cache: "no-store" });
+      const j = await r.json();
+      if (j[code]) { table = Object.fromEntries(Object.entries(j[code]).map(([k, v]) => [k.toUpperCase(), v])); date = j.date; }
+    } catch (e) {}
+  }
+  if (table) {
+    S.rates = { base: home, rates: table, date: date || today(), fetched: Date.now() };
+    save();
+    if (manual) toast(t("x.ratesOk"));
+    refreshOpenSettings();
+  } else if (manual) toast(t("x.ratesFail"));
+}
+const CURRENCIES = (() => {
+  const set = new Set(Object.values(META).map(m => m[2]).filter(Boolean));
+  ["EUR", "USD", "GBP", "CHF", "NOK", "SEK", "DKK", "RSD"].forEach(c => set.add(c));
+  return [...set].sort();
+})();
+
+/* ---------------- Trips ---------------- */
+const tripById = id => S.trips.find(x => x.id === id);
+const tripExp = id => S.expenses.filter(e => e.tripId === id);
+function tripTotals(trip) {
+  let total = 0, personal = 0;
+  const byCat = {};
+  for (const e of tripExp(trip.id)) {
+    if (e.personal) { personal += e.homeAmount; continue; }
+    total += e.homeAmount;
+    byCat[e.cat] = (byCat[e.cat] || 0) + e.homeAmount;
+  }
+  return { total, personal, byCat };
+}
+function tripCountries(trip) {
+  const seen = [];
+  for (const e of tripExp(trip.id).sort((a, b) => a.date.localeCompare(b.date))) if (!seen.includes(e.country)) seen.push(e.country);
+  return seen;
+}
+/** Keeps each country's automatic visit in step with the trip's expenses. */
+function syncTripVisits(tripId) {
+  const trip = tripById(tripId);
+  const byC = {};
+  if (trip) for (const e of tripExp(tripId)) (byC[e.country] || (byC[e.country] = [])).push(e.date);
+  for (const [code, c] of Object.entries(S.countries)) {
+    const before = c.visits.length;
+    c.visits = c.visits.filter(v => !(v.tripId === tripId && v.auto && !byC[code]));
+    if (before !== c.visits.length && c.autoStatus && !c.visits.length) { c.status = null; delete c.autoStatus; }
+  }
+  for (const [code, dates] of Object.entries(byC)) {
+    dates.sort();
+    const c = cset(code);
+    if (!c.status || c.status === "wish") { c.status = "visited"; c.autoStatus = true; }
+    let v = c.visits.find(v => v.tripId === tripId);
+    if (!v) c.visits.push({ id: uid(), tripId, auto: true, from: dates[0], to: dates[dates.length - 1], place: "", note: "" });
+    else if (v.auto) { v.from = dates[0]; v.to = dates[dates.length - 1]; }
+  }
+}
+function tripDays(trip) { return trip.from && trip.to ? dayDiff(trip.from, trip.to) + 1 : 0; }
+
+/* ---------------- Theme ---------------- */
+const mq = matchMedia("(prefers-color-scheme: dark)");
+function applyTheme() {
+  const th = S.settings.theme === "system" ? (mq.matches ? "dark" : "light") : S.settings.theme;
+  document.documentElement.dataset.theme = th;
+  document.documentElement.dataset.palette = S.settings.palette;
+  const bg = getComputedStyle(document.documentElement).getPropertyValue("--bg").trim();
+  try { AND?.setBars?.(bg, th === "light"); } catch (e) {}
+}
+mq.addEventListener?.("change", () => { if (S.settings.theme === "system") { applyTheme(); } });
+const cssVar = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+
+/* ---------------- Map ---------------- */
+const NS = "http://www.w3.org/2000/svg";
+class WorldMap {
+  constructor(svg) {
+    this.svg = svg;
+    this.region = "W";
+    this.rot = [-15, -35];
+    this.k = 1; this.tx = 0; this.ty = 0;
+    this.inset = 0; this.sel = null;
+    svg.innerHTML = `<defs><radialGradient id="gshade" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#000" stop-opacity="0"/><stop offset=".78" stop-color="#000" stop-opacity=".03"/><stop offset="1" stop-color="#000" stop-opacity=".16"/></radialGradient></defs>
+      <g class="vp"><path class="sphere"/><path class="grat"/><g class="lands"></g><path class="glow"/><g class="dots"></g></g>`;
+    this.vp = $(".vp", svg);
+    this.sphere = $(".sphere", svg); this.grat = $(".grat", svg); this.glow = $(".glow", svg);
+    const lands = $(".lands", svg), dots = $(".dots", svg);
+    this.paths = FEATURES.map(f => {
+      const p = document.createElementNS(NS, "path");
+      if (f.id) p.dataset.id = f.id;
+      lands.appendChild(p);
+      return p;
+    });
+    this.dots = DOTS.map(d => {
+      const g = document.createElementNS(NS, "g");
+      g.dataset.id = d.id;
+      g.innerHTML = `<circle class="hit" r="13"/><circle class="d" r="4.5"/>`;
+      dots.appendChild(g);
+      return { g, dot: g.lastChild, hit: g.firstChild, c: d.c, id: d.id };
+    });
+    this.graticule = d3.geoGraticule10();
+    this.gestures();
+    new ResizeObserver(() => this.render()).observe(svg);
+  }
+  get mode() { return S.settings.mapMode; }
+  projection() {
+    const w = this.w, h = this.h - this.inset;
+    if (this.mode === "globe") {
+      const r = Math.max(40, Math.min(w, h) / 2 - 14);
+      return d3.geoOrthographic().rotate(this.rot).scale(r).translate([w / 2, h / 2]).clipAngle(90).precision(0.6);
+    }
+    if (this.region === "W") return d3.geoEqualEarth().rotate([-11, 0]).fitExtent([[6, 10], [w - 6, h - 10]], { type: "FeatureCollection", features: FEATURES });
+    const R = REGIONS[this.region];
+    return d3.geoAzimuthalEqualArea().rotate([-R.c[0], -R.c[1]])
+      .fitExtent([[12, 12], [w - 12, h - 12]], { type: "MultiPoint", coordinates: R.box });
+  }
+  render() {
+    const box = this.svg.getBoundingClientRect();
+    this.w = box.width; this.h = box.height;
+    if (!this.w || !this.h) return;
+    const proj = this.proj = this.projection();
+    const path = d3.geoPath(proj);
+    const globe = this.mode === "globe";
+    this.sphere.setAttribute("d", globe ? path({ type: "Sphere" }) : "");
+    this.glow.setAttribute("d", globe ? path({ type: "Sphere" }) : "");
+    this.grat.setAttribute("d", globe ? path(this.graticule) : "");
+    FEATURES.forEach((f, i) => this.paths[i].setAttribute("d", path(f) || ""));
+    const center = [-this.rot[0], -this.rot[1]];
+    for (const d of this.dots) {
+      const visible = !globe || d3.geoDistance(d.c, center) < Math.PI / 2 - 0.02;
+      const p = visible && proj(d.c);
+      if (!p) { d.g.style.display = "none"; continue; }
+      d.g.style.display = "";
+      d.g.setAttribute("transform", `translate(${p[0].toFixed(1)},${p[1].toFixed(1)})`);
+    }
+    this.applyZoom();
+  }
+  applyZoom() {
+    if (this.mode === "globe") {
+      const cx = this.w / 2, cy = (this.h - this.inset) / 2;
+      this.tx = cx * (1 - this.k); this.ty = cy * (1 - this.k);
+    }
+    this.vp.setAttribute("transform", `translate(${this.tx},${this.ty}) scale(${this.k})`);
+    const r = 4 / Math.sqrt(this.k), hr = 12 / this.k;
+    for (const d of this.dots) {
+      d.dot.setAttribute("r", r);
+      d.hit.setAttribute("r", hr);
+    }
+  }
+  colorize() {
+    const dim = this.region !== "W";
+    FEATURES.forEach((f, i) => {
+      const p = this.paths[i];
+      if (!f.id) { p.setAttribute("class", "nt" + (dim ? " dim" : "")); return; }
+      let c = shade(f.id);
+      if (dim && META[f.id][0] !== this.region) c += " dim";
+      if (this.sel === f.id) c += " sel";
+      p.setAttribute("class", c.trim());
+    });
+    // Uncoloured dots only once zoomed in, so the world view stays clean.
+    const quiet = this.region === "W" && this.k < 2.5;
+    for (const d of this.dots) {
+      const sh = shade(d.id);
+      d.dot.setAttribute("class", "d " + (sh || "none"));
+      d.g.setAttribute("class", !sh && quiet ? "hide" : dim && META[d.id][0] !== this.region ? "dim" : "");
+    }
+  }
+  setRegion(r, animate = true) {
+    this.region = r;
+    if (this.mode === "globe") {
+      const target = r === "W" ? { c: [15, 35], k: 1 } : REGIONS[r];
+      this.animateTo([-target.c[0], -target.c[1]], target.k, animate);
+    } else {
+      this.k = 1; this.tx = 0; this.ty = 0;
+      this.render();
+    }
+    this.colorize();
+  }
+  animateTo(rot, k, animate) {
+    cancelAnimationFrame(this.anim);
+    const r0 = this.rot.slice(), k0 = this.k;
+    let dl = rot[0] - r0[0];
+    dl = ((dl + 540) % 360) - 180;
+    if (!animate) { this.rot = [r0[0] + dl, rot[1]]; this.k = k; this.render(); return; }
+    const t0 = performance.now(), ms = 650;
+    const step = now => {
+      const x = Math.min(1, (now - t0) / ms), e = x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+      this.rot = [r0[0] + dl * e, r0[1] + (rot[1] - r0[1]) * e];
+      this.k = k0 + (k - k0) * e;
+      this.render();
+      if (x < 1) this.anim = requestAnimationFrame(step);
+    };
+    this.anim = requestAnimationFrame(step);
+  }
+  zoomAt(k, px, py) {
+    const max = this.mode === "globe" ? 8 : 14;
+    k = Math.max(1, Math.min(max, k));
+    if (this.mode !== "globe") {
+      this.tx = px - (px - this.tx) * (k / this.k);
+      this.ty = py - (py - this.ty) * (k / this.k);
+    }
+    const was = this.k;
+    this.k = k;
+    this.clampPan();
+    this.applyZoom();
+    if ((was < 2.5) !== (k < 2.5)) this.colorize();
+  }
+  clampPan() {
+    if (this.mode === "globe") return;
+    const w = this.w, h = this.h - this.inset, m = 80;
+    this.tx = Math.min(m, Math.max(w - w * this.k - m, this.tx));
+    this.ty = Math.min(m, Math.max(h - h * this.k - m, this.ty));
+    if (this.k === 1) { this.tx = 0; this.ty = 0; }
+  }
+  gestures() {
+    const svg = this.svg, pts = new Map();
+    let start = null, moved = 0, pinch = null, frame = 0, multi = false;
+    const pos = e => { const b = svg.getBoundingClientRect(); return { x: e.clientX - b.left, y: e.clientY - b.top }; };
+    const schedule = () => { if (!frame) frame = requestAnimationFrame(() => { frame = 0; this.render(); }); };
+    svg.addEventListener("pointerdown", e => {
+      try { svg.setPointerCapture(e.pointerId); } catch (err) {}
+      pts.set(e.pointerId, pos(e));
+      cancelAnimationFrame(this.anim);
+      if (pts.size === 1) { start = { ...pos(e), t: Date.now(), cx: e.clientX, cy: e.clientY }; moved = 0; multi = false; }
+      if (pts.size === 2) {
+        const [a, b] = [...pts.values()];
+        pinch = { d: Math.hypot(a.x - b.x, a.y - b.y), k: this.k };
+        multi = true;
+      }
+    });
+    svg.addEventListener("pointermove", e => {
+      if (!pts.has(e.pointerId)) return;
+      const prev = pts.get(e.pointerId), cur = pos(e);
+      pts.set(e.pointerId, cur);
+      if (pts.size === 1 && !multi) {
+        const dx = cur.x - prev.x, dy = cur.y - prev.y;
+        moved += Math.abs(dx) + Math.abs(dy);
+        if (moved < 6) return;
+        if (this.mode === "globe") {
+          const r = this.proj.scale() * this.k, f = 180 / Math.PI / r;
+          this.rot = [this.rot[0] + dx * f, Math.max(-85, Math.min(85, this.rot[1] - dy * f))];
+          schedule();
+        } else {
+          this.tx += dx; this.ty += dy; this.clampPan(); this.applyZoom();
+        }
+      } else if (pts.size === 2 && pinch) {
+        const [a, b] = [...pts.values()];
+        const d = Math.hypot(a.x - b.x, a.y - b.y);
+        this.zoomAt(pinch.k * d / pinch.d, (a.x + b.x) / 2, (a.y + b.y) / 2);
+        if (this.mode === "globe") schedule();
+      }
+    });
+    const end = e => {
+      if (!pts.has(e.pointerId)) return;
+      pts.delete(e.pointerId);
+      if (pts.size < 2) pinch = null;
+      if (pts.size === 0 && !multi && moved < 8 && start && Date.now() - start.t < 600) {
+        const el = document.elementFromPoint(e.clientX, e.clientY);
+        const hit = el && el.closest && el.closest("[data-id]");
+        if (hit && svg.contains(hit)) openCountry(hit.dataset.id);
+      }
+    };
+    svg.addEventListener("pointerup", end);
+    svg.addEventListener("touchend", e => e.preventDefault(), { passive: false });
+    svg.addEventListener("pointercancel", end);
+    svg.addEventListener("wheel", e => {
+      e.preventDefault();
+      const p = pos(e);
+      this.zoomAt(this.k * (e.deltaY < 0 ? 1.2 : 1 / 1.2), p.x, p.y);
+      if (this.mode === "globe") schedule();
+    }, { passive: false });
+  }
+}
+let MAP;
+
+/* ---------------- Layers: sheets, pages, dialogs ---------------- */
+const stack = [];
+function pushLayer(html, kind, onClose) {
+  const el = document.createElement("div");
+  el.className = "lay";
+  el.style.cssText = "position:absolute;inset:0";
+  el.innerHTML = kind === "page" ? `<div class="page">${html}</div>` :
+    kind === "dialog" ? `<div class="scrim"></div><div class="dialog">${html}</div>` :
+    `<div class="scrim"></div><div class="sheet ${kind === "tall" ? "tall" : ""}">${html}</div>`;
+  $("#layer").appendChild(el);
+  const entry = { el, onClose, kind };
+  stack.push(entry);
+  const scrim = $(".scrim", el);
+  // Ignore the click that a touch generates right after the tap that opened this layer.
+  const opened = Date.now();
+  if (scrim) scrim.addEventListener("click", () => { if (Date.now() - opened > 450) closeLayer(entry); });
+  requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add("open")));
+  return el;
+}
+function closeLayer(entry = stack[stack.length - 1]) {
+  if (!entry) return;
+  const i = stack.indexOf(entry);
+  if (i < 0) return;
+  stack.splice(i, 1);
+  entry.el.classList.remove("open");
+  entry.el.classList.add("closing");
+  setTimeout(() => entry.el.remove(), 260);
+  entry.onClose?.();
+}
+const top1 = () => stack[stack.length - 1];
+window.gtBack = () => {
+  if (stack.length) { closeLayer(); return true; }
+  if (curTab !== "map") { showTab("map"); return true; }
+  return false;
+};
+function confirmBox(msg, okLabel, danger) {
+  return new Promise(res => {
+    let done = false;
+    const el = pushLayer(`<p>${esc(msg)}</p><div class="dbtns"><button class="btn sec" data-r="0">${t("b.cancel")}</button>
+      <button class="btn" data-r="1" ${danger ? 'style="background:#E5484D"' : ""}>${esc(okLabel || t("b.ok"))}</button></div>`,
+      "dialog", () => { if (!done) res(false); });
+    $$("[data-r]", el).forEach(b => b.addEventListener("click", () => { done = true; res(b.dataset.r === "1"); closeLayer(stack.find(s => s.el === el)); }));
+  });
+}
+let toastTimer;
+function toast(msg) {
+  const el = $("#toast");
+  el.textContent = msg;
+  el.classList.add("on");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove("on"), 2200);
+}
+
+/* ---------------- Tabs ---------------- */
+let curTab = "map";
+const NAV = [
+  ["map", "nav.map", '<path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path d="M9 4v14M15 6v14"/>'],
+  ["trip", "nav.trip", '<path d="M3 17h18M6 17l-2-6 3-1 3 3 4-2-3-6 3-1 6 7 3-1a1.5 1.5 0 0 1 1 2.8L7 17"/>'],
+  ["stats", "nav.stats", '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>'],
+];
+function renderNav() {
+  $("#nav").innerHTML = NAV.map(([k, l, ic]) =>
+    `<button class="${k === curTab ? "on" : ""}" data-act="tab" data-v="${k}"><span class="pill"><svg viewBox="0 0 24 24">${ic}</svg></span>${t(l)}</button>`).join("");
+}
+function showTab(k) {
+  curTab = k;
+  $$(".tab").forEach(el => el.classList.toggle("on", el.id === "tab-" + k));
+  renderNav();
+  if (k === "map") { renderMapPanel(); MAP.render(); MAP.colorize(); }
+  if (k === "trip") { renderTrip(); maybeLocate(); }
+  if (k === "stats") renderStats();
+}
+
+/* ---------------- Map tab ---------------- */
+const ICON_GLOBE = '<svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.7 3.8 5.7 3.8 9s-1.3 6.3-3.8 9c-2.5-2.7-3.8-5.7-3.8-9S9.5 5.7 12 3z"/></svg>';
+const ICON_FLAT = '<svg class="ico" viewBox="0 0 24 24"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path d="M9 4v14M15 6v14"/></svg>';
+function renderChips() {
+  $("#regionChips").innerHTML = ["W", ...CONTS].map(r =>
+    `<button class="chip ${MAP.region === r ? "on" : ""}" data-act="region" data-v="${r}">${t("r." + r)}</button>`).join("");
+  $("#modeBtn").innerHTML = S.settings.mapMode === "globe" ? ICON_FLAT : ICON_GLOBE;
+}
+function renderMapPanel() {
+  const r = MAP.region, c = counts(r), open = S.settings.panel;
+  const legend = `<div class="legend"><span><span class="ramp"><i style="background:var(--v1)"></i><i style="background:var(--v2)"></i><i style="background:var(--v3)"></i><i style="background:var(--v4)"></i></span>${t("st.visited")}</span>
+    <span><i style="background:var(--lived)"></i>${t("st.lived")}</span><span><i style="background:var(--wish)"></i>${t("st.wish")}</span></div>`;
+  let bars = "";
+  if (r === "W") {
+    bars = `<div class="bars">${CONTS.map(k => {
+      const x = counts(k);
+      return `<div class="bar">${t("r." + k)}<span class="t"><i style="width:${x.pct.toFixed(1)}%"></i></span><em>${x.v}/${x.total}</em></div>`;
+    }).join("")}</div>`;
+  } else {
+    bars = `<div class="note" style="margin-top:8px">${t("p.more", { a: c.lived, b: c.wish })}</div>`;
+  }
+  $("#mapPanel").innerHTML = `<div class="grabzone" data-act="togglePanel"><div class="grab"></div>
+    <div class="big"><div><div class="lbl">${r === "W" ? t("p.visited") : t("r." + r)}</div><div class="n">${c.v} <small>/ ${c.total}</small></div></div>
+    <div class="pct">${r === "W" ? t("p.ofWorld") : t("p.ofCont")}<b>${fmtPct(c.pct)}</b></div></div></div>
+    ${open ? legend + bars : ""}`;
+  requestAnimationFrame(() => {
+    if (!$("#mapPanel").offsetHeight) return;
+    const inset = $("#mapPanel").offsetHeight - 22;
+    if (Math.abs(inset - MAP.inset) > 1) { MAP.inset = inset; MAP.render(); }
+  });
+}
+function refreshMap() {
+  MAP.colorize();
+  if (curTab === "map") renderMapPanel();
+}
+
+/* ---------------- Country sheet ---------------- */
+function openCountry(code) {
+  if (!META[code]) return;
+  MAP.sel = code; MAP.colorize();
+  const el = pushLayer(`<div class="grab"></div><div id="csheet"></div>`, "sheet", () => { MAP.sel = null; MAP.colorize(); });
+  el.dataset.country = code;
+  renderCountry(el, code);
+}
+function renderCountry(el, code) {
+  const c = cget(code), m = META[code];
+  const visits = [...(c.visits || [])].sort((a, b) => (a.from || "").localeCompare(b.from || ""));
+  const days = visits.reduce((s, v) => s + (v.from && v.to ? dayDiff(v.from, v.to) + 1 : 0), 0);
+  const sub = [t("r." + m[0])];
+  if (visits.length) sub.push(tn("pl.visits", visits.length));
+  if (days) sub.push(tn("pl.days", days));
+  const ramp = ["var(--v1)", "var(--v2)", "var(--v3)", "var(--v4)"];
+  const statuses = [["visited", "var(--v3)"], ["lived", "var(--lived)"], ["wish", "var(--wish)"], [null, "var(--land)"]];
+  $("#csheet", el).innerHTML = `
+    <div class="ctitle"><span class="flag">${flag(code)}</span><div><h3>${esc(cname(code))}</h3><p>${sub.join(" · ")}</p></div></div>
+    ${m[1] ? "" : `<div class="note">${t("c.territory")}</div>`}
+    <div class="seg" style="margin:14px 0 6px">${statuses.map(([s, col]) =>
+      `<button class="${(c.status || null) === s ? "on" : ""}" data-act="setStatus" data-c="${code}" data-v="${s || ""}"><i style="background:${col}"></i>${t("st." + (s || "none"))}</button>`).join("")}</div>
+    ${visits.length ? visits.slice().reverse().map(v => {
+      const idx = visits.indexOf(v) + 1, trip = v.tripId && tripById(v.tripId);
+      return `<button class="visit" data-act="editVisit" data-c="${code}" data-v="${v.id}">
+        <span class="num" style="background:${ramp[Math.min(3, idx - 1)]}">${idx}</span>
+        <div><strong>${esc(v.place || (trip ? trip.name : fmtRange(v.from, v.to)))}</strong><span>${esc(v.place || trip ? fmtRange(v.from, v.to) : (v.note || ""))}</span></div><span class="go">›</span></button>`;
+    }).join("") : `<div class="note">${t("c.noVisits")}</div>`}
+    <button class="add" data-act="addVisit" data-c="${code}">${t("c.addVisit")}</button>`;
+}
+function refreshCountrySheets() {
+  for (const s of stack) if (s.el.dataset.country) renderCountry(s.el, s.el.dataset.country);
+}
+async function setStatus(code, status) {
+  const c = cset(code);
+  status = status || null;
+  if (c.status === status) return;
+  if ((status === null || status === "wish") && c.visits.length) {
+    if (!await confirmBox(t("q.removeVisits"), t("b.delete"), true)) return;
+    c.visits = [];
+  }
+  c.status = status;
+  delete c.autoStatus;
+  if (!c.status && !c.visits.length) delete S.countries[code];
+  save(); refreshMap(); refreshCountrySheets();
+}
+function openVisit(code, id) {
+  const c = cset(code);
+  const v = id ? c.visits.find(x => x.id === id) : { from: "", to: "", place: "", note: "" };
+  const trip = v.tripId && tripById(v.tripId);
+  const el = pushLayer(`<div class="grab"></div>
+    <div class="stitle">${flag(code)} ${esc(cname(code))} · ${t("v.title")}</div>
+    ${trip ? `<div class="note" style="margin-top:-8px">${esc(t("v.fromTrip", { name: trip.name }))}</div>` : ""}
+    <div class="two"><label class="field"><span>${t("v.from")}</span><input class="inp" type="date" id="vf" value="${v.from || ""}"></label>
+    <label class="field"><span>${t("v.to")}</span><input class="inp" type="date" id="vt" value="${v.to || ""}"></label></div>
+    <label class="field"><span>${t("v.place")}</span><input class="inp" id="vp" placeholder="${esc(t("v.placePh"))}" value="${esc(v.place)}"></label>
+    <label class="field"><span>${t("v.note")}</span><textarea class="inp" id="vn">${esc(v.note)}</textarea></label>
+    <div class="actions"><button class="btn" id="vsave">${t("b.save")}</button>
+    ${id ? `<button class="btn danger" id="vdel">${t("v.delete")}</button>` : ""}</div>`, "sheet");
+  $("#vf", el).addEventListener("change", e => { if (!$("#vt", el).value || $("#vt", el).value < e.target.value) $("#vt", el).value = e.target.value; });
+  $("#vsave", el).addEventListener("click", () => {
+    let from = $("#vf", el).value, to = $("#vt", el).value;
+    if (from && to && to < from) [from, to] = [to, from];
+    const data = { from, to: to || from, place: $("#vp", el).value.trim(), note: $("#vn", el).value.trim() };
+    if (id) Object.assign(v, data, { auto: false });
+    else c.visits.push({ id: uid(), ...data });
+    if (!c.status || c.status === "wish") c.status = "visited";
+    delete c.autoStatus;
+    save(); closeLayer(); refreshMap(); refreshCountrySheets();
+  });
+  if (id) $("#vdel", el).addEventListener("click", () => {
+    c.visits = c.visits.filter(x => x.id !== id);
+    save(); closeLayer(); refreshMap(); refreshCountrySheets();
+  });
+}
+
+/* ---------------- Country list / picker ---------------- */
+function openList(onPick, title) {
+  let filter = "all", q = "";
+  const el = pushLayer(`<header class="top"><button class="iconbtn" data-close><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <div class="h1" style="flex:1;font-size:22px">${esc(title || t("l.title"))}</div></header>
+    <div class="pad"><div class="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input class="inp" id="lq" placeholder="${esc(t("l.ph"))}" autocomplete="off"></div></div>
+    ${onPick ? "" : `<div class="chips" id="lf"></div>`}
+    <div class="scroll pad" id="lres"></div>`, "page");
+  $("[data-close]", el).addEventListener("click", () => closeLayer());
+  const all = Object.keys(META).map(c => ({ c, n: cname(c) }));
+  const coll = new Intl.Collator(LOCALES[LANG]);
+  all.sort((a, b) => coll.compare(a.n, b.n));
+  const norm = s => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+  const dot = code => {
+    const s = shade(code);
+    return s ? `<span class="sd" style="background:var(--${s === "lv" ? "lived" : s === "ws" ? "wish" : s})"></span>` : "";
+  };
+  const draw = () => {
+    if (!onPick) $("#lf", el).innerHTML = [["all", t("l.all")], ["visited", t("st.visited")], ["lived", t("st.lived")], ["wish", t("st.wish")], ...CONTS.map(k => [k, t("r." + k)])]
+      .map(([k, l]) => `<button class="chip ${filter === k ? "on" : ""}" data-f="${k}">${l}</button>`).join("");
+    const nq = norm(q);
+    let list = all.filter(x => !nq || norm(x.n).includes(nq) || norm(META[x.c][3]).includes(nq) || x.c.toLowerCase() === nq);
+    if (filter === "visited") list = list.filter(x => isVisited(x.c));
+    else if (filter === "lived" || filter === "wish") list = list.filter(x => S.countries[x.c]?.status === filter);
+    else if (CONTS.includes(filter)) list = list.filter(x => META[x.c][0] === filter);
+    const counted = list.filter(x => META[x.c][1]), terr = list.filter(x => !META[x.c][1]);
+    const row = x => `<button class="li" data-pick="${x.c}"><span class="fl">${flag(x.c)}</span><div><strong>${esc(x.n)}</strong><span>${t("r." + META[x.c][0])}${onPick ? " · " + META[x.c][2] : ""}</span></div>${dot(x.c)}</button>`;
+    $("#lres", el).innerHTML = !list.length ? `<div class="empty">${t("l.none")}</div>` :
+      `<div class="list">${counted.map(row).join("")}</div>` +
+      (terr.length ? `<div class="h4"><b>${t("l.terr")}</b></div><div class="list">${terr.map(row).join("")}</div>` : "");
+  };
+  draw();
+  $("#lq", el).addEventListener("input", e => { q = e.target.value; draw(); });
+  el.addEventListener("click", e => {
+    const f = e.target.closest("[data-f]");
+    if (f) { filter = f.dataset.f; draw(); return; }
+    const p = e.target.closest("[data-pick]");
+    if (!p) return;
+    if (onPick) { closeLayer(); onPick(p.dataset.pick); }
+    else openCountry(p.dataset.pick);
+  });
+  const entry = stack[stack.length - 1];
+  entry.refresh = draw;
+}
+function pickCurrency(onPick) {
+  const el = pushLayer(`<div class="grab"></div><div class="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+    <input class="inp" id="cq" placeholder="EUR, USD…" autocomplete="off"></div><div class="list" id="cres"></div>`, "tall");
+  const draw = q => {
+    q = (q || "").toLowerCase();
+    $("#cres", el).innerHTML = CURRENCIES.filter(c => !q || c.toLowerCase().includes(q) || (curName(c) || "").toLowerCase().includes(q))
+      .map(c => `<button class="li" data-cur="${c}"><strong style="width:52px;flex:none">${c}</strong><div><span>${esc(curName(c) || "")}</span></div></button>`).join("");
+  };
+  draw();
+  $("#cq", el).addEventListener("input", e => draw(e.target.value));
+  el.addEventListener("click", e => { const b = e.target.closest("[data-cur]"); if (b) { closeLayer(); onPick(b.dataset.cur); } });
+}
+
+/* ---------------- Trip tab ---------------- */
+let viewTripId = null;   // a past trip opened from the list; null = current trip
+let gpsSuggest = null;
+function renderTrip() {
+  const cur = tripById(S.settings.currentTrip);
+  const trip = tripById(viewTripId) || cur;
+  $("#fab").style.display = trip ? "" : "none";
+  const home = S.settings.home;
+  const past = S.trips.filter(x => x !== trip).sort((a, b) => (b.from || "").localeCompare(a.from || ""));
+  if (!trip) {
+    $("#tripView").innerHTML = `<header class="top"><div class="h1">${t("t.title")}</div></header>
+      <div class="pad"><div class="card" style="padding:26px 20px;text-align:center">
+        <div style="font-size:44px">🧳</div><div style="font-size:18px;font-weight:800;margin:10px 0 6px">${t("t.none")}</div>
+        <div class="muted" style="font-size:14px;font-weight:600;line-height:1.5">${esc(t("t.noneSub", { cur: home }))}</div>
+        <button class="btn" style="margin-top:18px" data-act="newTrip">${t("t.start")}</button></div>
+      ${past.length ? `<div class="h4"><b>${t("t.past")}</b></div>${tripList(past)}` : ""}</div>`;
+    return;
+  }
+  const tot = tripTotals(trip), cc = tripCountries(trip), days = tripDays(trip), td = today();
+  let when = "";
+  if (trip.from && td < trip.from) when = t("t.starts", { days: tn("pl.days", dayDiff(td, trip.from)) });
+  else if (trip.to && td > trip.to) when = t("t.ended");
+  else if (trip.from) when = t("t.day", { d: dayDiff(trip.from, td) + 1, n: days || "?" });
+  const elapsed = trip.from ? Math.max(1, Math.min(days || 1e9, dayDiff(trip.from, td) + 1)) : 1;
+  const pct = trip.budget ? Math.min(100, tot.total / trip.budget * 100) : 0;
+  const here = trip.country;
+  const isCur = trip.id === S.settings.currentTrip;
+  const catSum = Object.entries(tot.byCat).sort((a, b) => b[1] - a[1]);
+  const exps = tripExp(trip.id).sort((a, b) => b.date.localeCompare(a.date) || (b.t || 0) - (a.t || 0));
+  const groups = [];
+  for (const e of exps) { const g = groups[groups.length - 1]; if (g && g.date === e.date) g.list.push(e); else groups.push({ date: e.date, list: [e] }); }
+  const yd = iso(new Date(Date.now() - 864e5));
+  const dayLabel = d => d === td ? t("t.today") : d === yd ? t("t.yesterday") : fmtDate(d, d.slice(0, 4) !== td.slice(0, 4));
+  $("#tripView").innerHTML = `<header class="top">
+      ${viewTripId && viewTripId !== S.settings.currentTrip ? `<button class="iconbtn" data-act="closeTripView"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>` : ""}
+      <div class="h1" style="flex:1">${t("t.title")}</div>
+      <button class="iconbtn" data-act="tripMenu"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="19" cy="12" r="1.3"/></svg></button></header>
+    <div class="pad">
+      <div class="hero">
+        <div class="hrow"><span>${cc.map(flag).join(" ")}${cc.length ? " · " : ""}${esc(fmtRange(trip.from, trip.to))}</span><span>${esc(when)}</span></div>
+        <h3>${esc(trip.name)}</h3>
+        <div class="sum">${fmtAmt(tot.total)} <small>${trip.cur}</small></div>
+        ${trip.budget ? `<div class="prog ${tot.total > trip.budget ? "over" : ""}"><i style="width:${pct}%"></i></div>` : `<div style="height:14px"></div>`}
+        <div class="meta"><span>${trip.budget ? t("t.budget", { v: fmtMoney(trip.budget, trip.cur) }) : t("t.noBudget")}</span>
+          <span>${tot.total ? t("t.perDay", { v: fmtMoney(tot.total / elapsed, trip.cur) }) : ""}</span></div>
+        ${tot.personal ? `<div class="pers">${t("t.personal", { v: fmtMoney(tot.personal, trip.cur) })}</div>` : ""}
+      </div>
+      ${isCur && gpsSuggest && gpsSuggest !== here ? `<button class="banner" data-act="gpsSwitch"><span class="flag">📍</span><div>${esc(t("t.here", { c: cname(gpsSuggest) }))}<span>${META[gpsSuggest][2]}${rateLine(META[gpsSuggest][2], trip.cur, " · ")}</span></div><b>${t("t.switch")}</b></button>` : ""}
+      ${isCur ? `<button class="banner" data-act="pickHere"><span class="flag">${here ? flag(here) : "🌍"}</span><div>${here ? esc(t("t.now", { c: cname(here) })) : t("t.pick")}<span>${here ? trip.currency || META[here][2] : ""}${here ? rateLine(trip.currency || META[here][2], trip.cur, " · ") : ""}</span></div><span class="go muted" style="font-size:20px">›</span></button>` : ""}
+      ${catSum.length ? `<div class="cats">${catSum.map(([k, v]) => `<i style="flex:${v};background:${CAT[k].c}"></i>`).join("")}</div>
+        <div class="catleg">${catSum.slice(0, 6).map(([k, v]) => `<span><i style="background:${CAT[k].c}"></i>${t("cat." + k)} ${v / tot.total < .01 ? "<1" : Math.round(v / tot.total * 100)}%</span>`).join("")}</div>` : ""}
+      ${groups.length ? groups.map(g => {
+        const sum = g.list.filter(e => !e.personal).reduce((s, e) => s + e.homeAmount, 0);
+        return `<div class="day"><span>${esc(dayLabel(g.date))}</span><span>${fmtMoney(sum, trip.cur)}</span></div>` +
+          g.list.map(e => `<button class="exp" data-act="editExpense" data-v="${e.id}"><span class="em">${CAT[e.cat]?.e || "✨"}</span>
+          <div><strong>${esc(e.note || t("cat." + e.cat))}${e.personal ? `<span class="tag">${t("e.tag")}</span>` : ""}</strong>
+          <span>${flag(e.country)} ${fmtMoney(e.amount, e.currency)}${e.pay ? " · " + t(e.pay === "cash" ? "e.cash" : "e.card") : ""}</span></div>
+          <div class="amt"><strong>${fmtAmt(e.homeAmount)}</strong><span>${trip.cur}</span></div></button>`).join("");
+      }).join("") : `<div class="empty">${t("t.noExp")}</div>`}
+      ${!viewTripId && past.length ? `<div class="h4"><b>${t("t.past")}</b></div>${tripList(past)}` : ""}
+    </div>`;
+}
+function rateLine(from, to, pre) {
+  if (from === to) return "";
+  const r = rateOf(from, to);
+  if (!r) return "";
+  return pre + (r < 0.1 ? t("t.rate", { a: to, r: fmtRate(1 / r), b: from }) : t("t.rate", { a: from, r: fmtRate(r), b: to }));
+}
+function tripList(trips) {
+  return `<div class="list">${trips.map(tr => {
+    const tot = tripTotals(tr), cc = tripCountries(tr);
+    return `<button class="li" data-act="openTrip" data-v="${tr.id}"><span class="fl">${cc.length ? cc.slice(0, 3).map(flag).join("") : "🧳"}</span>
+      <div><strong>${esc(tr.name)}</strong><span>${esc(fmtRange(tr.from, tr.to))}${tripDays(tr) ? " · " + tn("pl.days", tripDays(tr)) : ""}</span></div>
+      <div class="amt">${fmtAmt(tot.total)}<span class="muted">${tr.cur}</span></div></button>`;
+  }).join("")}</div>`;
+}
+function openTripForm(trip) {
+  const home = trip ? trip.cur : S.settings.home;
+  const el = pushLayer(`<div class="grab"></div><div class="stitle">${trip ? t("t.edit") : t("t.new")}</div>
+    <label class="field"><span>${t("t.name")}</span><input class="inp" id="tn" placeholder="${esc(t("t.namePh"))}" value="${esc(trip?.name || "")}"></label>
+    <div class="two"><label class="field"><span>${t("v.from")}</span><input class="inp" type="date" id="tf" value="${trip?.from || today()}"></label>
+    <label class="field"><span>${t("v.to")}</span><input class="inp" type="date" id="tt" value="${trip?.to || ""}"></label></div>
+    <label class="field"><span>${t("t.budgetL", { cur: home })}</span><input class="inp" id="tb" inputmode="decimal" value="${trip?.budget ? String(trip.budget).replace(".", decSep()) : ""}"></label>
+    <div class="actions"><button class="btn" id="tsave">${t("b.save")}</button>
+    ${trip ? `<button class="btn danger" id="tdel">${t("t.del")}</button>` : ""}</div>`, "sheet");
+  $("#tf", el).addEventListener("change", e => { if ($("#tt", el).value && $("#tt", el).value < e.target.value) $("#tt", el).value = e.target.value; });
+  $("#tsave", el).addEventListener("click", () => {
+    let from = $("#tf", el).value, to = $("#tt", el).value;
+    if (from && to && to < from) [from, to] = [to, from];
+    const data = { name: $("#tn", el).value.trim() || t("t.defName"), from, to, budget: parseNum($("#tb", el).value) || 0 };
+    if (trip) Object.assign(trip, data);
+    else {
+      const nt = { id: uid(), cur: S.settings.home, country: S.settings.lastCountry || null, created: Date.now(), ...data };
+      if (gpsSuggest) nt.country = gpsSuggest;
+      S.trips.push(nt);
+      S.settings.currentTrip = nt.id;
+      viewTripId = null;
+    }
+    save(); closeLayer(); renderTrip();
+  });
+  if (trip) $("#tdel", el).addEventListener("click", async () => {
+    if (!await confirmBox(t("t.delQ"), t("b.delete"), true)) return;
+    S.expenses = S.expenses.filter(e => e.tripId !== trip.id);
+    S.trips = S.trips.filter(x => x.id !== trip.id);
+    syncTripVisits(trip.id);
+    if (S.settings.currentTrip === trip.id) S.settings.currentTrip = null;
+    viewTripId = null;
+    save(); closeLayer(); renderTrip(); refreshMap();
+  });
+}
+function tripMenu() {
+  const trip = tripById(viewTripId) || tripById(S.settings.currentTrip);
+  if (!trip) return;
+  const isCur = trip.id === S.settings.currentTrip;
+  const el = pushLayer(`<div class="grab"></div><div class="stitle">${esc(trip.name)}</div><div class="list">
+    <button class="li" data-m="edit"><span class="fl">✏️</span><div><strong>${t("t.edit")}</strong></div></button>
+    ${isCur ? `<button class="li" data-m="end"><span class="fl">🏁</span><div><strong>${t("t.end")}</strong></div></button>` :
+      `<button class="li" data-m="resume"><span class="fl">▶️</span><div><strong>${t("t.resume")}</strong></div></button>`}
+    </div>`, "sheet");
+  el.addEventListener("click", e => {
+    const m = e.target.closest("[data-m]")?.dataset.m;
+    if (!m) return;
+    closeLayer();
+    if (m === "edit") openTripForm(trip);
+    if (m === "end") { if (!trip.to || trip.to > today()) trip.to = today(); S.settings.currentTrip = null; viewTripId = trip.id; save(); renderTrip(); }
+    if (m === "resume") { S.settings.currentTrip = trip.id; viewTripId = null; save(); renderTrip(); }
+  });
+}
+function setTripCountry(trip, code) {
+  trip.country = code;
+  trip.currency = META[code][2] || trip.cur;
+  S.settings.lastCountry = code;
+  save(); renderTrip();
+}
+
+/* Location: one reading when the trip tab opens; the country comes from the
+   bundled borders, so no internet is needed. */
+let lastLocate = 0;
+function maybeLocate() {
+  const trip = tripById(S.settings.currentTrip);
+  if (!trip || !navigator.geolocation || Date.now() - lastLocate < 20 * 60e3) return;
+  lastLocate = Date.now();
+  navigator.geolocation.getCurrentPosition(p => {
+    const pt = [p.coords.longitude, p.coords.latitude];
+    const f = FEATURES.find(f => f.id && d3.geoContains(f, pt));
+    if (!f) return;
+    gpsSuggest = f.id;
+    const tr = tripById(S.settings.currentTrip);
+    if (tr && !tr.country) setTripCountry(tr, f.id);
+    else if (curTab === "trip") renderTrip();
+  }, () => {}, { enableHighAccuracy: false, timeout: 15000, maximumAge: 30 * 60e3 });
+}
+
+/* ---------------- Expense sheet ---------------- */
+const decSep = () => (1.5).toLocaleString(LOCALES[LANG]).charAt(1);
+function parseNum(s) {
+  s = String(s || "").trim().replace(/\s/g, "");
+  if (!s) return 0;
+  const sep = decSep();
+  s = sep === "," ? s.replace(/\./g, "").replace(",", ".") : s.replace(/,/g, "");
+  const n = parseFloat(s);
+  return isFinite(n) ? n : 0;
+}
+function openExpense(id) {
+  const trip = tripById(viewTripId) || tripById(S.settings.currentTrip);
+  if (!trip) return;
+  const old = id ? S.expenses.find(e => e.id === id) : null;
+  const country = old?.country || trip.country || S.settings.lastCountry || null;
+  const x = {
+    country, currency: old?.currency || trip.currency || (country ? META[country][2] : trip.cur) || trip.cur,
+    date: old?.date || (trip.to && today() > trip.to ? trip.to : trip.from && today() < trip.from ? trip.from : today()),
+    amt: old ? String(old.amount).replace(".", decSep()) : "",
+    cat: old?.cat || null, pay: old?.pay || "card", personal: old?.personal || false, note: old?.note || "",
+    homeOverride: old && old.manualHome ? String(old.homeAmount).replace(".", decSep()) : "", more: !!(old && (old.note || old.manualHome)),
+  };
+  const el = pushLayer(`<div class="grab"></div><div id="xs"></div>`, "tall");
+  const amount = () => parseNum(x.amt);
+  const rate = () => old && old.currency === x.currency && old.tripCur === trip.cur && !old.manualHome && old.rate ? old.rate : rateOf(x.currency, trip.cur);
+  const homeVal = () => {
+    const o = parseNum(x.homeOverride);
+    if (o > 0) return o;
+    const r = rate();
+    return r ? amount() * r : null;
+  };
+  const draw = () => {
+    const a = amount(), r = rate(), hv = homeVal();
+    let conv;
+    if (x.currency === trip.cur) conv = `<span class="conv"><span>${t("e.homeAmt", { cur: trip.cur })}</span></span>`;
+    else if (hv != null) conv = `<button class="conv" data-x="more">≈ ${fmtMoney(hv, trip.cur)}${r ? ` <span>· ${rateLine(x.currency, trip.cur, "")}</span>` : ""}</button>`;
+    else conv = `<button class="conv warn" data-x="more">${esc(t("e.noRate", { cur: x.currency, home: trip.cur }))}</button>`;
+    $("#xs", el).innerHTML = `
+      <div class="where"><button data-x="country">${x.country ? flag(x.country) + " " + esc(cname(x.country)) : "🌍 " + t("t.pick")} ▾</button>
+        <button data-x="cur">${x.currency} ▾</button>
+        <label>${esc(x.date === today() ? t("t.today") : fmtDate(x.date))} ▾<input type="date" id="xd" value="${x.date}"></label></div>
+      <div class="amount ${a ? "" : "zero"}">${a ? esc(x.amt) : "0"} <small>${x.currency}</small></div>
+      ${conv}
+      <div class="grid">${CATS.map(([k, e]) => `<button class="${x.cat === k ? "on" : ""}" data-cat="${k}"><em>${e}</em>${t("cat." + k)}</button>`).join("")}</div>
+      <div class="opts"><div class="mini"><button class="${x.pay === "card" ? "on" : ""}" data-pay="card">${t("e.card")}</button><button class="${x.pay === "cash" ? "on" : ""}" data-pay="cash">${t("e.cash")}</button></div>
+        <button class="sw ${x.personal ? "on" : ""}" data-x="personal">${t("e.personal")}<i></i></button></div>
+      ${x.more ? `<div class="more">
+        ${x.currency !== trip.cur ? `<label class="field"><span>${t("e.homeAmt", { cur: trip.cur })} · ${t("e.homeHint")}</span><input class="inp" id="xh" inputmode="decimal" value="${esc(x.homeOverride)}" placeholder="${hv != null && !parseNum(x.homeOverride) ? esc(fmtAmt(hv)) : ""}"></label>` : ""}
+        <label class="field"><span>${t("e.note")}</span><input class="inp" id="xn" value="${esc(x.note)}"></label></div>` :
+        `<button class="note" data-x="more" style="display:block;margin:10px auto 0;color:var(--accent);font-weight:700">+ ${t("e.more", { cur: trip.cur })}</button>`}
+      <div class="keys">${["1","2","3","4","5","6","7","8","9",decSep(),"0","⌫"].map(k => `<button data-k="${k}">${k}</button>`).join("")}</div>
+      <div class="actions"><button class="btn" id="xsave" ${a > 0 && x.cat && hv != null && x.country ? "" : "disabled"}>${t("b.save")}</button>
+      ${old ? `<button class="btn danger" data-x="del">${t("e.delete")}</button>` : ""}</div>`;
+    $("#xd", el).addEventListener("change", e => { if (e.target.value) { x.date = e.target.value; draw(); } });
+    const xh = $("#xh", el), xn = $("#xn", el);
+    if (xh) xh.addEventListener("input", e => { x.homeOverride = e.target.value; updateSave(); });
+    if (xn) xn.addEventListener("input", e => { x.note = e.target.value; });
+  };
+  const updateSave = () => {
+    const hv = homeVal();
+    $("#xsave", el).disabled = !(amount() > 0 && x.cat && hv != null && x.country);
+  };
+  draw();
+  el.addEventListener("click", async e => {
+    const k = e.target.closest("[data-k]")?.dataset.k;
+    if (k) {
+      if (k === "⌫") x.amt = x.amt.slice(0, -1);
+      else if (k === decSep()) { if (!x.amt.includes(k)) x.amt = (x.amt || "0") + k; }
+      else {
+        const [i, f] = x.amt.split(decSep());
+        if (f !== undefined && f.length >= 2) return;
+        if (f === undefined && (i || "").length >= 9) return;
+        x.amt = x.amt === "0" ? k : x.amt + k;
+      }
+      draw(); return;
+    }
+    const cat = e.target.closest("[data-cat]")?.dataset.cat;
+    if (cat) { x.cat = cat; if (!old) x.personal = PERSONAL_CATS.has(cat); draw(); return; }
+    const pay = e.target.closest("[data-pay]")?.dataset.pay;
+    if (pay) { x.pay = pay; draw(); return; }
+    const act = e.target.closest("[data-x]")?.dataset.x;
+    if (act === "personal") { x.personal = !x.personal; draw(); }
+    if (act === "more") { x.more = true; draw(); }
+    if (act === "country") openList(code => { x.country = code; x.currency = META[code][2] || x.currency; x.homeOverride = ""; draw(); }, t("t.pick"));
+    if (act === "cur") pickCurrency(c => { x.currency = c; x.homeOverride = ""; draw(); });
+    if (act === "del") {
+      S.expenses = S.expenses.filter(z => z.id !== old.id);
+      syncTripVisits(trip.id);
+      save(); closeLayer(); renderTrip(); refreshMap();
+    }
+    if (e.target.closest("#xsave")) {
+      const a = amount(), hv = homeVal();
+      if (!(a > 0 && x.cat && hv != null && x.country)) return;
+      const manualHome = parseNum(x.homeOverride) > 0;
+      const rec = {
+        tripId: trip.id, date: x.date, country: x.country, currency: x.currency, amount: a,
+        rate: manualHome ? hv / a : (x.currency === trip.cur ? 1 : rate()), tripCur: trip.cur,
+        homeAmount: Math.round(hv * 100) / 100, manualHome, cat: x.cat, pay: x.pay, personal: x.personal, note: x.note.trim(),
+      };
+      if (old) Object.assign(old, rec);
+      else S.expenses.push({ id: uid(), t: Date.now(), ...rec });
+      if (trip.id === S.settings.currentTrip && x.date === today() && trip.country !== x.country) {
+        trip.country = x.country; trip.currency = x.currency;
+      }
+      S.settings.lastCountry = x.country;
+      syncTripVisits(trip.id);
+      save(); closeLayer(); renderTrip(); refreshMap();
+    }
+  });
+}
+
+/* ---------------- Stats tab ---------------- */
+function allDays() {
+  let d = 0;
+  for (const c of Object.values(S.countries)) for (const v of c.visits || []) if (v.from && v.to) d += dayDiff(v.from, v.to) + 1;
+  return d;
+}
+function renderStats() {
+  const w = counts("W"), yr = today().slice(0, 4);
+  const firstYear = {};
+  for (const [code, c] of Object.entries(S.countries)) {
+    if (!META[code]?.[1] || !isVisited(code)) continue;
+    const ds = (c.visits || []).map(v => v.from).filter(Boolean).sort();
+    if (ds.length) firstYear[code] = ds[0].slice(0, 4);
+  }
+  const newThisYear = Object.values(firstYear).filter(y => y === yr).length;
+  const conts = CONTS.filter(k => counts(k).v > 0);
+  const missing = CONTS.filter(k => !conts.includes(k)).map(k => t("r." + k));
+  const tripDaysSum = S.trips.reduce((s, tr) => s + tripDays(tr), 0);
+  let spent = 0, other = false;
+  for (const tr of S.trips) {
+    const tot = tripTotals(tr).total;
+    const r = rateOf(tr.cur, S.settings.home);
+    if (r) spent += tot * r; else other = true;
+  }
+  const ago = S.settings.lastBackup ? Math.floor((Date.now() - S.settings.lastBackup) / 864e5) : null;
+  const hasData = Object.keys(S.countries).length || S.trips.length;
+  const remind = hasData && (ago === null || ago >= 30);
+  const C = 2 * Math.PI * 22;
+  const trips = [...S.trips].sort((a, b) => (b.from || "").localeCompare(a.from || ""));
+  $("#statsView").innerHTML = `<header class="top"><div class="h1">${t("s.title")}</div>
+      <button class="iconbtn" data-act="share"><svg viewBox="0 0 24 24"><path d="M12 3v12M7 8l5-5 5 5M5 14v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"/></svg></button></header>
+    <div class="pad">
+      ${remind ? `<div class="remind"><span style="font-size:22px">💾</span><div>${ago === null ? t("s.backupNever") : esc(t("s.backupOld", { days: tn("pl.days", ago) }))}</div><button data-act="exportData">${t("s.backupBtn")}</button></div>` : ""}
+      <div class="tiles">
+        <div class="tile"><div class="lbl">${t("s.countries")}</div><div class="v">${w.v} <small>/ ${w.total}</small></div><div class="s">${newThisYear ? t("s.year", { n: newThisYear }) : fmtPct(w.pct)}</div></div>
+        <div class="tile"><div class="lbl">${t("s.conts")}</div><div class="v">${conts.length} <small>/ 5</small></div><div class="s">${missing.length ? esc(t("s.missing", { list: missing.join(", ") })) : t("s.allConts")}</div></div>
+        <div class="tile"><div class="lbl">${t("s.trips")}</div><div class="v">${S.trips.length}</div><div class="s">${tripDaysSum ? esc(t("s.onRoad", { days: tn("pl.days", tripDaysSum) })) : "—"}</div></div>
+        <div class="tile"><div class="lbl">${t("s.spent")}</div><div class="v">${compact(spent)} <small>${S.settings.home}</small></div><div class="s">${t("s.noPersonal")}${other ? " *" : ""}</div></div>
+      </div>
+      <div class="rings">${CONTS.map(k => {
+        const p = counts(k).pct;
+        return `<div class="ring"><svg viewBox="0 0 54 54"><circle cx="27" cy="27" r="22" fill="none" stroke="var(--chip)" stroke-width="6"/>
+          <circle cx="27" cy="27" r="22" fill="none" stroke="var(--v3)" stroke-width="6" stroke-linecap="round" stroke-dasharray="${(C * p / 100).toFixed(1)} ${C.toFixed(1)}" transform="rotate(-90 27 27)" ${p ? "" : 'stroke-opacity="0"'}/>
+          <text x="27" y="31.5" text-anchor="middle">${Math.round(p)}%</text></svg>${t("r." + k)}</div>`;
+      }).join("")}</div>
+      <div class="h4"><b>${t("s.trips")}</b></div>
+      ${trips.length ? tripList(trips) : `<div class="empty">${t("s.noTrips")}</div>`}
+    </div>`;
+}
+function compact(n) {
+  if (n < 1e6) return fmtNum(n);
+  try { return new Intl.NumberFormat(LOCALES[LANG], { notation: "compact", maximumFractionDigits: n >= 1e6 ? 1 : 0 }).format(n); }
+  catch (e) { return fmtNum(n); }
+}
+
+/* ---------------- Share image ---------------- */
+async function drawShare() {
+  await document.fonts.load("800 40px Manrope").catch(() => {});
+  const W = 1080, H = 1920, cv = document.createElement("canvas");
+  cv.width = W; cv.height = H;
+  const x = cv.getContext("2d");
+  const rose = S.settings.palette === "rose";
+  x.fillStyle = "#0A0E18"; x.fillRect(0, 0, W, H);
+  const g1 = x.createRadialGradient(200, 0, 0, 200, 0, 1100);
+  g1.addColorStop(0, rose ? "rgba(214,60,131,.75)" : "rgba(43,79,168,.85)"); g1.addColorStop(1, "rgba(10,14,24,0)");
+  x.fillStyle = g1; x.fillRect(0, 0, W, H);
+  const g2 = x.createRadialGradient(W, H, 0, W, H, 900);
+  g2.addColorStop(0, rose ? "rgba(138,99,245,.55)" : "rgba(138,59,92,.7)"); g2.addColorStop(1, "rgba(10,14,24,0)");
+  x.fillStyle = g2; x.fillRect(0, 0, W, H);
+  const F = (w, s) => `${w} ${s}px Manrope, sans-serif`;
+  // brand
+  const cg = x.createConicGradient ? x.createConicGradient(3.5, 112, 150) : null;
+  if (cg) { ["v2", "v4", "lived", "wish", "v2"].forEach((v, i) => cg.addColorStop(i / 4, cssVar("--" + v))); x.fillStyle = cg; } else x.fillStyle = cssVar("--v3");
+  x.beginPath(); x.arc(112, 150, 26, 0, 7); x.fill();
+  x.fillStyle = "#fff"; x.font = F(800, 44); x.textBaseline = "middle"; x.fillText("GlobeTint", 156, 152);
+  // headline
+  const w = counts("W");
+  x.textBaseline = "alphabetic";
+  x.font = F(800, 118); x.fillText(t("sh.head"), 80, 400);
+  const pct = t("sh.pct", { p: fmtPct(w.pct) });
+  const tg = x.createLinearGradient(80, 0, 1000, 0);
+  tg.addColorStop(0, rose ? "#FFC2DA" : "#8EC5FF"); tg.addColorStop(1, rose ? "#C9B2FF" : "#FF9C8A");
+  x.fillStyle = tg;
+  let fs = 108; x.font = F(800, fs);
+  while (x.measureText(pct).width > 920 && fs > 60) { fs -= 4; x.font = F(800, fs); }
+  x.fillText(pct, 80, 530);
+  const conts = CONTS.filter(k => counts(k).v > 0).length;
+  x.fillStyle = "rgba(255,255,255,.7)"; x.font = F(600, 40);
+  x.fillText([tn("pl.countries", w.v), tn("pl.continents", conts), tn("pl.trips", S.trips.length)].join(" · "), 80, 610);
+  // map
+  const proj = d3.geoEqualEarth().rotate([-11, 0]).fitExtent([[40, 680], [W - 40, 1180]], { type: "Sphere" });
+  const path = d3.geoPath(proj, x);
+  const col = { v1: cssVar("--v1"), v2: cssVar("--v2"), v3: cssVar("--v3"), v4: cssVar("--v4"), lv: cssVar("--lived"), ws: cssVar("--wish") };
+  x.lineWidth = 1; x.strokeStyle = "#0A0E18";
+  for (const f of FEATURES) {
+    x.beginPath(); path(f);
+    x.fillStyle = f.id && shade(f.id) ? col[shade(f.id)] : "rgba(255,255,255,.13)";
+    x.fill(); x.stroke();
+  }
+  // continent bars
+  let y = 1290;
+  for (const k of CONTS) {
+    const c = counts(k);
+    x.fillStyle = "#fff"; x.font = F(700, 36); x.fillText(t("r." + k), 80, y + 12);
+    x.fillStyle = "rgba(255,255,255,.1)"; roundRect(x, 330, y - 8, 560, 16, 8); x.fill();
+    if (c.pct > 0) { const bg = x.createLinearGradient(330, 0, 890, 0); bg.addColorStop(0, rose ? "#FFC2DA" : "#8EC5FF"); bg.addColorStop(1, rose ? "#C9B2FF" : "#FF9C8A"); x.fillStyle = bg; roundRect(x, 330, y - 8, Math.max(16, 560 * c.pct / 100), 16, 8); x.fill(); }
+    x.fillStyle = "rgba(255,255,255,.7)"; x.font = F(700, 34); x.textAlign = "right"; x.fillText(Math.round(c.pct) + "%", W - 80, y + 12); x.textAlign = "left";
+    y += 74;
+  }
+  // tiles
+  const visits = Object.values(S.countries).reduce((s, c) => s + (c.visits?.length || 0), 0);
+  const tiles = [[w.v, t("sh.c")], [allDays(), t("sh.d")], [visits, t("sh.v")]];
+  tiles.forEach(([n, l], i) => {
+    const tx = 80 + i * 316, ty = 1660;
+    x.fillStyle = "rgba(255,255,255,.07)"; roundRect(x, tx, ty, 288, 170, 36); x.fill();
+    x.strokeStyle = "rgba(255,255,255,.08)"; x.lineWidth = 2; x.stroke();
+    x.fillStyle = "#fff"; x.font = F(800, 70); x.fillText(fmtNum(n), tx + 30, ty + 92);
+    x.fillStyle = "rgba(255,255,255,.65)"; x.font = F(700, 28); x.fillText(l.toUpperCase(), tx + 30, ty + 138);
+  });
+  return cv;
+}
+function roundRect(x, a, b, w, h, r) {
+  x.beginPath(); x.moveTo(a + r, b); x.arcTo(a + w, b, a + w, b + h, r); x.arcTo(a + w, b + h, a, b + h, r);
+  x.arcTo(a, b + h, a, b, r); x.arcTo(a, b, a + w, b, r); x.closePath();
+}
+async function openShare() {
+  const cv = await drawShare();
+  const url = cv.toDataURL("image/png");
+  const b64 = url.split(",")[1];
+  const name = `globetint-${today()}.png`;
+  const el = pushLayer(`<div class="grab"></div><div class="stitle">${t("sh.title")}</div><img class="shareimg" src="${url}" alt="">
+    <div class="two"><button class="btn sec" id="ssave">${t("sh.save")}</button><button class="btn" id="sshare">${t("sh.share")}</button></div>`, "tall");
+  $("#sshare", el).addEventListener("click", async () => {
+    if (AND?.shareImage) { AND.shareImage(b64, name); return; }
+    try {
+      const blob = await (await fetch(url)).blob();
+      const file = new File([blob], name, { type: "image/png" });
+      if (navigator.canShare?.({ files: [file] })) { await navigator.share({ files: [file] }); return; }
+    } catch (e) {}
+    download(url, name);
+  });
+  $("#ssave", el).addEventListener("click", () => {
+    if (AND?.saveBase64) AND.saveBase64(name, "image/png", b64);
+    else download(url, name);
+  });
+}
+function download(url, name) {
+  const a = document.createElement("a");
+  a.href = url; a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+}
+
+/* ---------------- Settings ---------------- */
+let settingsEl = null;
+function openSettings() {
+  settingsEl = pushLayer(`<header class="top"><button class="iconbtn" data-close><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+    <div class="h1" style="flex:1;font-size:22px">${t("g.title")}</div></header><div class="scroll pad" id="gs"></div>`, "page", () => { settingsEl = null; });
+  $("[data-close]", settingsEl).addEventListener("click", () => closeLayer());
+  renderSettings();
+  settingsEl.addEventListener("change", onSettingsChange);
+  settingsEl.addEventListener("click", onSettingsClick);
+}
+function refreshOpenSettings() { if (settingsEl) renderSettings(); }
+function renderSettings() {
+  const s = S.settings, home = s.home;
+  const seg = (key, opts) => `<div class="seg row1">${opts.map(([v, l]) => `<button class="${s[key] === v ? "on" : ""}" data-set="${key}" data-v="${v}">${l}</button>`).join("")}</div>`;
+  const manual = Object.entries(s.manual).filter(([k]) => k.endsWith("/" + home));
+  let version = "";
+  try { version = AND?.getVersion?.() || ""; } catch (e) {}
+  $("#gs", settingsEl).innerHTML = `
+    <div class="group"><div class="lbl">${t("g.general")}</div><div class="card" style="padding:2px 16px">
+      <label class="set">${t("g.lang")}<select data-sel="lang">${[["auto", t("g.langAuto")], ["sr", "Српски"], ["en", "English"], ["nb", "Norsk"]].map(([v, l]) => `<option value="${v}" ${s.lang === v ? "selected" : ""}>${l}</option>`).join("")}</select></label>
+      <label class="set">${t("g.home")}<select data-sel="home">${CURRENCIES.map(c => `<option value="${c}" ${home === c ? "selected" : ""}>${c}</option>`).join("")}</select></label>
+      <div class="set">${t("g.theme")}${seg("theme", [["system", t("g.sys")], ["light", t("g.light")], ["dark", t("g.dark")]])}</div>
+      <div class="set">${t("g.palette")}${seg("palette", [["blue", "🔵 " + t("g.blue")], ["rose", "🌸 " + t("g.rose")]])}</div>
+      <div class="set">${t("g.mapMode")}${seg("mapMode", [["globe", t("g.globe")], ["flat", t("g.flat")]])}</div>
+    </div></div>
+    <div class="group"><div class="lbl">${t("g.rates")}</div><div class="card" style="padding:2px 16px">
+      <div class="set"><span style="font-weight:600;font-size:13px" class="muted">${S.rates ? esc(t("g.ratesAt", { date: fmtDate(S.rates.date, true) })) + " · " + S.rates.base : t("g.ratesNever")}</span>
+        <button style="color:var(--accent);font-weight:800" data-g="refresh">${t("g.refresh")}</button></div>
+    </div>
+    <div class="lbl" style="margin:16px 0 8px 4px">${t("g.manual")}</div>
+    <div class="card" style="padding:2px 16px">
+      ${manual.map(([k, v]) => `<div class="rate">1 ${k.split("/")[0]} =<input inputmode="decimal" data-rate="${k}" value="${esc(String(v).replace(".", decSep()))}"> ${home}<button class="x" data-g="delRate" data-v="${k}">×</button></div>`).join("")}
+      <div class="rate" style="${manual.length ? "" : "border-top:0"}"><button style="color:var(--accent);font-weight:800" data-g="addRate">+ ${t("g.add")}</button></div>
+    </div><div class="note" style="margin-left:4px">${t("g.manualHint")}</div></div>
+    <div class="group"><div class="lbl">${t("g.data")}</div><div class="card" style="padding:2px 16px">
+      <button class="set" data-g="export">${t("g.export")}<span class="val">${s.lastBackup ? esc(fmtDate(iso(new Date(s.lastBackup)), true)) : ""}</span></button>
+      <button class="set" data-g="import">${t("g.import")}</button>
+      <button class="set" data-g="wipe" style="color:#E5484D">${t("g.wipe")}</button>
+    </div></div>
+    <div class="group"><div class="lbl">${t("g.about")}</div><div class="card" style="padding:2px 16px">
+      <div class="set">${t("g.version")}<span class="val">${esc(version || "web")}</span></div>
+      ${AND?.checkForUpdate ? `<button class="set" data-g="update">${t("g.update")}<span class="val">›</span></button>` : ""}
+    </div></div>
+    <div class="note" style="text-align:center;margin-top:24px">GlobeTint · Natural Earth</div>`;
+}
+function onSettingsChange(e) {
+  const k = e.target.dataset.sel;
+  if (k) {
+    S.settings[k] = e.target.value;
+    save();
+    if (k === "lang") applyLang();
+    if (k === "home") fetchRates(false);
+    rerenderAll(); renderSettings();
+    return;
+  }
+  const r = e.target.dataset.rate;
+  if (r) {
+    const v = parseNum(e.target.value);
+    if (v > 0) { S.settings.manual[r] = v; save(); }
+  }
+}
+function onSettingsClick(e) {
+  const b = e.target.closest("[data-set]");
+  if (b) {
+    S.settings[b.dataset.set] = b.dataset.v;
+    save();
+    if (b.dataset.set === "theme" || b.dataset.set === "palette") applyTheme();
+    if (b.dataset.set === "mapMode") { MAP.k = 1; MAP.setRegion(MAP.region, false); renderChips(); }
+    renderSettings();
+    return;
+  }
+  const g = e.target.closest("[data-g]")?.dataset.g;
+  if (!g) return;
+  if (g === "refresh") fetchRates(true);
+  if (g === "addRate") pickCurrency(c => {
+    if (c === S.settings.home) return;
+    const k = c + "/" + S.settings.home;
+    S.settings.manual[k] = S.settings.manual[k] || Math.round((rateOf(c, S.settings.home) || 1) * 10000) / 10000;
+    save(); renderSettings();
+  });
+  if (g === "delRate") { delete S.settings.manual[e.target.closest("[data-g]").dataset.v]; save(); renderSettings(); }
+  if (g === "export") exportData();
+  if (g === "import") $("#importFile").click();
+  if (g === "wipe") wipe();
+  if (g === "update") AND.checkForUpdate();
+}
+function exportData() {
+  S.settings.lastBackup = Date.now();
+  const text = JSON.stringify({ app: "globetint", v: 1, exported: new Date().toISOString(), state: S }, null, 1);
+  const name = `globetint-backup-${today()}.json`;
+  if (AND?.saveFile) AND.saveFile(name, text);
+  else { download(URL.createObjectURL(new Blob([text], { type: "application/json" })), name); toast(t("g.saved")); }
+  save();
+  if (curTab === "stats") renderStats();
+  refreshOpenSettings();
+}
+$("#importFile").addEventListener("change", async e => {
+  const f = e.target.files[0];
+  e.target.value = "";
+  if (!f) return;
+  let data;
+  try { data = JSON.parse(await f.text()); } catch (err) { data = null; }
+  if (!data || data.app !== "globetint" || !data.state) { toast(t("g.importBad")); return; }
+  if (!await confirmBox(t("g.importQ"), t("b.yes"))) return;
+  S = normalize(data.state);
+  S.settings.lastBackup = Date.now();
+  await flush();
+  applyLang(); applyTheme(); rerenderAll(); refreshOpenSettings();
+  toast(t("g.importOk"));
+});
+async function wipe() {
+  if (!await confirmBox(t("g.wipeQ"), t("b.delete"), true)) return;
+  const keep = S.settings;
+  S = blank();
+  S.settings = { ...keep, currentTrip: null, lastBackup: 0 };
+  viewTripId = null;
+  await flush();
+  rerenderAll(); refreshOpenSettings();
+}
+
+/* ---------------- Global actions ---------------- */
+const ACTIONS = {
+  tab: v => showTab(v),
+  region: v => { MAP.setRegion(v); renderChips(); renderMapPanel(); },
+  toggleMode: () => {
+    S.settings.mapMode = S.settings.mapMode === "globe" ? "flat" : "globe";
+    save(); MAP.k = 1; MAP.setRegion(MAP.region, false); renderChips();
+  },
+  togglePanel: () => { S.settings.panel = !S.settings.panel; save(); renderMapPanel(); },
+  openList: () => openList(),
+  openSettings: () => openSettings(),
+  setStatus: (v, el) => setStatus(el.dataset.c, v),
+  addVisit: (v, el) => openVisit(el.dataset.c),
+  editVisit: (v, el) => openVisit(el.dataset.c, v),
+  newTrip: () => openTripForm(),
+  tripMenu: () => tripMenu(),
+  openTrip: v => { viewTripId = v === S.settings.currentTrip ? null : v; showTab("trip"); $("#tripView").scrollTop = 0; },
+  closeTripView: () => { viewTripId = null; renderTrip(); },
+  addExpense: () => openExpense(),
+  editExpense: v => openExpense(v),
+  pickHere: () => { const tr = tripById(S.settings.currentTrip); if (tr) openList(code => setTripCountry(tr, code), t("t.pick")); },
+  gpsSwitch: () => { const tr = tripById(S.settings.currentTrip); if (tr && gpsSuggest) setTripCountry(tr, gpsSuggest); },
+  share: () => openShare(),
+  exportData: () => exportData(),
+};
+document.addEventListener("click", e => {
+  const el = e.target.closest("[data-act]");
+  if (!el) return;
+  const fn = ACTIONS[el.dataset.act];
+  if (fn) fn(el.dataset.v, el);
+});
+
+function applyLang() {
+  LANG = S.settings.lang === "auto" ? detectLang() : S.settings.lang;
+  setLocale();
+}
+function rerenderAll() {
+  renderNav(); renderChips(); MAP.colorize();
+  if (curTab === "map") renderMapPanel();
+  if (curTab === "trip") renderTrip();
+  if (curTab === "stats") renderStats();
+  for (const s of stack) s.refresh?.();
+  refreshCountrySheets();
+}
+
+/* ---------------- Start ---------------- */
+(async function start() {
+  await DB.open();
+  S = normalize(await DB.get("state"));
+  applyLang();
+  applyTheme();
+  MAP = new WorldMap($("#map"));
+  renderNav(); renderChips();
+  MAP.colorize();
+  renderMapPanel();
+  MAP.render();
+  try { AND?.ready?.(); } catch (e) {}
+  fetchRates(false);
+})();
+</script>
+</body>
+</html>
