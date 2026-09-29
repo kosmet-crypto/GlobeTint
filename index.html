@@ -19,8 +19,8 @@
   color-scheme:light;
 }
 :root[data-palette="rose"]{
-  --v1:#F9C8DB;--v2:#F4A2C5;--v3:#EB7BAD;--v4:#DE5895;--lived:#BA2268;--wish:#F0A030;--accent:#C8367A;
-  --hero1:#F07AAE;--hero2:#D0407F;--hero3:#A0245F;
+  --v1:#FBD0DF;--v2:#F7A8C3;--v3:#F07FA6;--v4:#E65A8D;--lived:#D2336A;--wish:#F0A030;--accent:#D2336A;
+  --hero1:#F584AA;--hero2:#E0457C;--hero3:#B82A5E;
 }
 :root[data-palette="violet"]{
   --v1:#CBBDF6;--v2:#A993EC;--v3:#8468DB;--v4:#6447C2;--lived:#331E7A;--wish:#F0A030;--accent:#6E56CF;
@@ -84,7 +84,6 @@ main{flex:1;position:relative;overflow:hidden}
 #map .dots g.hide{display:none}
 #map .dots circle.hit{fill:transparent}
 #map .dots g.dim{opacity:.35}
-.modebtn{position:absolute;right:16px;top:8px;width:44px;height:44px;border-radius:15px;background:var(--card);box-shadow:var(--shadow);display:grid;place-items:center;z-index:2}
 
 .panel{position:absolute;left:0;right:0;bottom:0;background:var(--card);border-radius:28px 28px 0 0;box-shadow:0 -10px 40px rgba(17,21,28,.10);padding:8px 20px 16px;z-index:3}
 :root[data-theme="dark"] .panel{box-shadow:none;border-top:1px solid var(--line)}
@@ -143,6 +142,12 @@ main{flex:1;position:relative;overflow:hidden}
 .banner .flag{font-size:26px}
 .banner div{flex:1;min-width:0}.banner div span{display:block;color:var(--muted);font-size:12px;font-weight:600;margin-top:1px}
 .banner b{background:var(--ink);color:var(--bg);font-size:12px;padding:8px 12px;border-radius:10px;flex:none}
+.strip{display:grid;grid-template-columns:repeat(3,1fr);background:var(--card);border-radius:18px;box-shadow:var(--shadow);margin-top:12px;padding:12px 0}
+.strip div{text-align:center;border-left:1px solid var(--line);padding:0 6px;min-width:0}
+.strip div:first-child{border-left:0}
+.strip span{display:block;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px}
+.strip b{display:block;font-size:17px;font-weight:800;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.strip small{font-size:11px;color:var(--muted);font-weight:700}
 .cats{display:flex;height:10px;border-radius:5px;overflow:hidden;gap:2px;margin:18px 0 10px}
 .catleg{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;font-weight:600;color:var(--muted)}
 .catleg span{display:flex;align-items:center;gap:5px}.catleg i{width:8px;height:8px;border-radius:50%}
@@ -291,7 +296,6 @@ textarea.inp{height:76px;padding:12px 14px;resize:none}
       <div class="chips" id="regionChips"></div>
       <div class="mapwrap" id="mapwrap">
         <svg id="map"></svg>
-        <button class="modebtn" data-act="toggleMode" id="modeBtn" aria-label="globe/map"></button>
       </div>
       <div class="panel" id="mapPanel"></div>
     </section>
@@ -352,11 +356,11 @@ for (const f of FEATURES) {
 for (const [id, c] of Object.entries(D.points)) DOTS.push({ id, c });
 
 const REGIONS = {
-  EU: { c: [15, 52], k: 2.4, box: [[-11, 36], [33, 35], [45, 39], [50, 42], [40, 68], [-22, 64], [24, 71]] },
-  AS: { c: [92, 28], k: 1.35, box: [[34, 30], [146, 44], [125, -10], [95, -10], [60, 55], [140, 55], [46, 13]] },
-  AF: { c: [18, 2], k: 1.55, box: [[-18, 34], [52, 12], [20, -35], [-17, 15], [33, 32]] },
-  AM: { c: [-80, 12], k: 1.0, box: [[-168, 66], [-52, 48], [-35, -8], [-72, -55], [-118, 32]] },
-  OC: { c: [160, -18], k: 1.6, box: [[113, -22], [153, -28], [178, -47], [-172, -14], [172, 7], [134, 7]] },
+  EU: { c: [15, 52], k: 2.4 },
+  AS: { c: [92, 28], k: 1.35 },
+  AF: { c: [18, 2], k: 1.55 },
+  AM: { c: [-80, 12], k: 1.0 },
+  OC: { c: [160, -18], k: 1.6 },
 };
 
 const CATS = [
@@ -390,7 +394,7 @@ const T = {
     "t.title": "Путовање", "t.none": "Нема активног путовања",
     "t.noneSub": "Започни путовање и уписуј трошкове у локалној валути. GlobeTint их одмах претвара у {cur}.",
     "t.start": "Започни путовање", "t.past": "Ранија путовања", "t.day": "Дан {d} / {n}", "t.starts": "Почиње за {days}",
-    "t.ended": "Завршено", "t.budget": "Буџет {v}", "t.noBudget": "Без буџета", "t.perDay": "≈ {v} / дан",
+    "t.ended": "Завршено", "t.budget": "Буџет {v}", "t.noBudget": "Без буџета", "t.left": "Остаје {v}", "t.over": "Преко буџета {v}", "t.total": "Укупно", "t.avg": "Просек / дан", "t.days": "Дана",
     "t.personal": "Личне куповине: {v}", "t.today": "Данас", "t.yesterday": "Јуче",
     "t.noExp": "Још нема трошкова. Додај први на дугме +.",
     "t.here": "Твоја локација: {c}", "t.switch": "Пребаци", "t.now": "Тренутно: {c}", "t.pick": "Изабери земљу у којој си",
@@ -413,8 +417,7 @@ const T = {
     "sh.c": "Земље", "sh.d": "Дани", "sh.v": "Посете", "sh.share": "Подели", "sh.save": "Сачувај слику",
     "g.title": "Подешавања", "g.general": "Опште", "g.lang": "Језик", "g.langAuto": "Као на телефону",
     "g.theme": "Тема", "g.sys": "Систем", "g.light": "Светла", "g.dark": "Тамна",
-    "g.palette": "Боје", "g.blue": "Плава", "g.rose": "Роза", "g.violet": "Љубичаста", "g.home": "Матична валута", "g.mapMode": "Свет",
-    "g.globe": "Глобус", "g.flat": "Мапа",
+    "g.palette": "Боје", "g.blue": "Плава", "g.rose": "Роза", "g.violet": "Љубичаста", "g.home": "Матична валута",
     "g.rates": "Курсеви", "g.ratesAt": "Ажурирано {date}", "g.ratesNever": "Курсеви још нису преузети", "g.refresh": "Освежи",
     "g.manual": "Ручни курсеви", "g.manualHint": "Имају предност над аутоматским. Корисно у мењачници или без интернета.",
     "g.add": "Додај", "g.data": "Подаци", "g.export": "Сачувај бекап", "g.import": "Врати из бекапа",
@@ -446,7 +449,7 @@ const T = {
     "t.title": "Trip", "t.none": "No active trip",
     "t.noneSub": "Start a trip and log expenses in the local currency. GlobeTint converts them to {cur} right away.",
     "t.start": "Start a trip", "t.past": "Earlier trips", "t.day": "Day {d} / {n}", "t.starts": "Starts in {days}",
-    "t.ended": "Finished", "t.budget": "Budget {v}", "t.noBudget": "No budget", "t.perDay": "≈ {v} / day",
+    "t.ended": "Finished", "t.budget": "Budget {v}", "t.noBudget": "No budget", "t.left": "{v} left", "t.over": "{v} over budget", "t.total": "Total", "t.avg": "Avg / day", "t.days": "Days",
     "t.personal": "Personal purchases: {v}", "t.today": "Today", "t.yesterday": "Yesterday",
     "t.noExp": "No expenses yet. Add the first one with the + button.",
     "t.here": "Your location: {c}", "t.switch": "Switch", "t.now": "Now: {c}", "t.pick": "Choose the country you are in",
@@ -469,8 +472,7 @@ const T = {
     "sh.c": "Countries", "sh.d": "Days", "sh.v": "Visits", "sh.share": "Share", "sh.save": "Save image",
     "g.title": "Settings", "g.general": "General", "g.lang": "Language", "g.langAuto": "Same as phone",
     "g.theme": "Theme", "g.sys": "System", "g.light": "Light", "g.dark": "Dark",
-    "g.palette": "Colours", "g.blue": "Blue", "g.rose": "Rose", "g.violet": "Violet", "g.home": "Home currency", "g.mapMode": "World",
-    "g.globe": "Globe", "g.flat": "Map",
+    "g.palette": "Colours", "g.blue": "Blue", "g.rose": "Rose", "g.violet": "Violet", "g.home": "Home currency",
     "g.rates": "Exchange rates", "g.ratesAt": "Updated {date}", "g.ratesNever": "Rates not downloaded yet", "g.refresh": "Refresh",
     "g.manual": "Manual rates", "g.manualHint": "They take priority over automatic rates. Handy at the exchange office or offline.",
     "g.add": "Add", "g.data": "Data", "g.export": "Save backup", "g.import": "Restore from backup",
@@ -502,7 +504,7 @@ const T = {
     "t.title": "Reise", "t.none": "Ingen aktiv reise",
     "t.noneSub": "Start en reise og før utgifter i lokal valuta. GlobeTint regner dem straks om til {cur}.",
     "t.start": "Start en reise", "t.past": "Tidligere reiser", "t.day": "Dag {d} / {n}", "t.starts": "Starter om {days}",
-    "t.ended": "Avsluttet", "t.budget": "Budsjett {v}", "t.noBudget": "Uten budsjett", "t.perDay": "≈ {v} / dag",
+    "t.ended": "Avsluttet", "t.budget": "Budsjett {v}", "t.noBudget": "Uten budsjett", "t.left": "{v} igjen", "t.over": "{v} over budsjett", "t.total": "Totalt", "t.avg": "Snitt / dag", "t.days": "Dager",
     "t.personal": "Personlige kjøp: {v}", "t.today": "I dag", "t.yesterday": "I går",
     "t.noExp": "Ingen utgifter ennå. Legg til den første med +-knappen.",
     "t.here": "Din posisjon: {c}", "t.switch": "Bytt", "t.now": "Nå: {c}", "t.pick": "Velg landet du er i",
@@ -525,8 +527,7 @@ const T = {
     "sh.c": "Land", "sh.d": "Dager", "sh.v": "Besøk", "sh.share": "Del", "sh.save": "Lagre bilde",
     "g.title": "Innstillinger", "g.general": "Generelt", "g.lang": "Språk", "g.langAuto": "Som telefonen",
     "g.theme": "Tema", "g.sys": "System", "g.light": "Lyst", "g.dark": "Mørkt",
-    "g.palette": "Farger", "g.blue": "Blå", "g.rose": "Rosa", "g.violet": "Lilla", "g.home": "Hjemmevaluta", "g.mapMode": "Verden",
-    "g.globe": "Globus", "g.flat": "Kart",
+    "g.palette": "Farger", "g.blue": "Blå", "g.rose": "Rosa", "g.violet": "Lilla", "g.home": "Hjemmevaluta",
     "g.rates": "Valutakurser", "g.ratesAt": "Oppdatert {date}", "g.ratesNever": "Kursene er ikke hentet ennå", "g.refresh": "Oppdater",
     "g.manual": "Manuelle kurser", "g.manualHint": "Går foran de automatiske. Nyttig på vekslingskontoret eller uten nett.",
     "g.add": "Legg til", "g.data": "Data", "g.export": "Lagre sikkerhetskopi", "g.import": "Gjenopprett fra sikkerhetskopi",
@@ -659,7 +660,7 @@ function guessHome() {
 function blank() {
   return {
     v: 1, countries: {}, trips: [], expenses: [],
-    settings: { lang: "auto", theme: "system", palette: "blue", home: guessHome(), mapMode: "globe",
+    settings: { lang: "auto", theme: "system", palette: "blue", home: guessHome(),
                 panel: true, currentTrip: null, lastBackup: 0, manual: {}, lastCountry: null },
     rates: null,
   };
@@ -817,7 +818,7 @@ class WorldMap {
     this.svg = svg;
     this.region = "W";
     this.rot = [-15, -35];
-    this.k = 1; this.tx = 0; this.ty = 0;
+    this.k = 1;
     this.inset = 0; this.sel = null;
     svg.innerHTML = `<defs><radialGradient id="gshade" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#000" stop-opacity="0"/><stop offset=".78" stop-color="#000" stop-opacity=".03"/><stop offset="1" stop-color="#000" stop-opacity=".16"/></radialGradient></defs>
       <g class="vp"><path class="sphere"/><path class="grat"/><g class="lands"></g><path class="glow"/><g class="dots"></g></g>`;
@@ -841,17 +842,10 @@ class WorldMap {
     this.gestures();
     new ResizeObserver(() => this.render()).observe(svg);
   }
-  get mode() { return S.settings.mapMode; }
   projection() {
     const w = this.w, h = this.h - this.inset;
-    if (this.mode === "globe") {
-      const r = Math.max(40, Math.min(w, h) / 2 - 14);
-      return d3.geoOrthographic().rotate(this.rot).scale(r).translate([w / 2, h / 2]).clipAngle(90).precision(0.6);
-    }
-    if (this.region === "W") return d3.geoEqualEarth().rotate([-11, 0]).fitExtent([[6, 10], [w - 6, h - 10]], { type: "FeatureCollection", features: FEATURES });
-    const R = REGIONS[this.region];
-    return d3.geoAzimuthalEqualArea().rotate([-R.c[0], -R.c[1]])
-      .fitExtent([[12, 12], [w - 12, h - 12]], { type: "MultiPoint", coordinates: R.box });
+    const r = Math.max(40, Math.min(w, h) / 2 - 14);
+    return d3.geoOrthographic().rotate(this.rot).scale(r).translate([w / 2, h / 2]).clipAngle(90).precision(0.6);
   }
   render() {
     const box = this.svg.getBoundingClientRect();
@@ -859,14 +853,13 @@ class WorldMap {
     if (!this.w || !this.h) return;
     const proj = this.proj = this.projection();
     const path = d3.geoPath(proj);
-    const globe = this.mode === "globe";
-    this.sphere.setAttribute("d", globe ? path({ type: "Sphere" }) : "");
-    this.glow.setAttribute("d", globe ? path({ type: "Sphere" }) : "");
-    this.grat.setAttribute("d", globe ? path(this.graticule) : "");
+    this.sphere.setAttribute("d", path({ type: "Sphere" }));
+    this.glow.setAttribute("d", path({ type: "Sphere" }));
+    this.grat.setAttribute("d", path(this.graticule));
     FEATURES.forEach((f, i) => this.paths[i].setAttribute("d", path(f) || ""));
     const center = [-this.rot[0], -this.rot[1]];
     for (const d of this.dots) {
-      const visible = !globe || d3.geoDistance(d.c, center) < Math.PI / 2 - 0.02;
+      const visible = d3.geoDistance(d.c, center) < Math.PI / 2 - 0.02;
       const p = visible && proj(d.c);
       if (!p) { d.g.style.display = "none"; continue; }
       d.g.style.display = "";
@@ -874,12 +867,10 @@ class WorldMap {
     }
     this.applyZoom();
   }
+  /** Zoom scales the drawn globe around its centre; rotation redraws it. */
   applyZoom() {
-    if (this.mode === "globe") {
-      const cx = this.w / 2, cy = (this.h - this.inset) / 2;
-      this.tx = cx * (1 - this.k); this.ty = cy * (1 - this.k);
-    }
-    this.vp.setAttribute("transform", `translate(${this.tx},${this.ty}) scale(${this.k})`);
+    const cx = this.w / 2, cy = (this.h - this.inset) / 2;
+    this.vp.setAttribute("transform", `translate(${cx * (1 - this.k)},${cy * (1 - this.k)}) scale(${this.k})`);
     const r = 4 / Math.sqrt(this.k), hr = 12 / this.k;
     for (const d of this.dots) {
       d.dot.setAttribute("r", r);
@@ -906,13 +897,8 @@ class WorldMap {
   }
   setRegion(r, animate = true) {
     this.region = r;
-    if (this.mode === "globe") {
-      const target = r === "W" ? { c: [15, 35], k: 1 } : REGIONS[r];
-      this.animateTo([-target.c[0], -target.c[1]], target.k, animate);
-    } else {
-      this.k = 1; this.tx = 0; this.ty = 0;
-      this.render();
-    }
+    const target = r === "W" ? { c: [15, 35], k: 1 } : REGIONS[r];
+    this.animateTo([-target.c[0], -target.c[1]], target.k, animate);
     this.colorize();
   }
   animateTo(rot, k, animate) {
@@ -931,25 +917,12 @@ class WorldMap {
     };
     this.anim = requestAnimationFrame(step);
   }
-  zoomAt(k, px, py) {
-    const max = this.mode === "globe" ? 8 : 14;
-    k = Math.max(1, Math.min(max, k));
-    if (this.mode !== "globe") {
-      this.tx = px - (px - this.tx) * (k / this.k);
-      this.ty = py - (py - this.ty) * (k / this.k);
-    }
+  zoomAt(k) {
+    k = Math.max(1, Math.min(8, k));
     const was = this.k;
     this.k = k;
-    this.clampPan();
     this.applyZoom();
     if ((was < 2.5) !== (k < 2.5)) this.colorize();
-  }
-  clampPan() {
-    if (this.mode === "globe") return;
-    const w = this.w, h = this.h - this.inset, m = 80;
-    this.tx = Math.min(m, Math.max(w - w * this.k - m, this.tx));
-    this.ty = Math.min(m, Math.max(h - h * this.k - m, this.ty));
-    if (this.k === 1) { this.tx = 0; this.ty = 0; }
   }
   gestures() {
     const svg = this.svg, pts = new Map();
@@ -975,18 +948,13 @@ class WorldMap {
         const dx = cur.x - prev.x, dy = cur.y - prev.y;
         moved += Math.abs(dx) + Math.abs(dy);
         if (moved < 6) return;
-        if (this.mode === "globe") {
-          const r = this.proj.scale() * this.k, f = 180 / Math.PI / r;
-          this.rot = [this.rot[0] + dx * f, Math.max(-85, Math.min(85, this.rot[1] - dy * f))];
-          schedule();
-        } else {
-          this.tx += dx; this.ty += dy; this.clampPan(); this.applyZoom();
-        }
+        const r = this.proj.scale() * this.k, f = 180 / Math.PI / r;
+        this.rot = [this.rot[0] + dx * f, Math.max(-85, Math.min(85, this.rot[1] - dy * f))];
+        schedule();
       } else if (pts.size === 2 && pinch) {
         const [a, b] = [...pts.values()];
         const d = Math.hypot(a.x - b.x, a.y - b.y);
-        this.zoomAt(pinch.k * d / pinch.d, (a.x + b.x) / 2, (a.y + b.y) / 2);
-        if (this.mode === "globe") schedule();
+        this.zoomAt(pinch.k * d / pinch.d);
       }
     });
     const end = e => {
@@ -1004,9 +972,7 @@ class WorldMap {
     svg.addEventListener("pointercancel", end);
     svg.addEventListener("wheel", e => {
       e.preventDefault();
-      const p = pos(e);
-      this.zoomAt(this.k * (e.deltaY < 0 ? 1.2 : 1 / 1.2), p.x, p.y);
-      if (this.mode === "globe") schedule();
+      this.zoomAt(this.k * (e.deltaY < 0 ? 1.2 : 1 / 1.2));
     }, { passive: false });
   }
 }
@@ -1086,12 +1052,9 @@ function showTab(k) {
 }
 
 /* ---------------- Map tab ---------------- */
-const ICON_GLOBE = '<svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.7 3.8 5.7 3.8 9s-1.3 6.3-3.8 9c-2.5-2.7-3.8-5.7-3.8-9S9.5 5.7 12 3z"/></svg>';
-const ICON_FLAT = '<svg class="ico" viewBox="0 0 24 24"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path d="M9 4v14M15 6v14"/></svg>';
 function renderChips() {
   $("#regionChips").innerHTML = ["W", ...CONTS].map(r =>
     `<button class="chip ${MAP.region === r ? "on" : ""}" data-act="region" data-v="${r}">${t("r." + r)}</button>`).join("");
-  $("#modeBtn").innerHTML = S.settings.mapMode === "globe" ? ICON_FLAT : ICON_GLOBE;
 }
 function renderMapPanel() {
   const r = MAP.region, c = counts(r), open = S.settings.panel;
@@ -1299,11 +1262,12 @@ function renderTrip() {
         <div class="sum">${fmtAmt(tot.total)} <small>${trip.cur}</small></div>
         ${trip.budget ? `<div class="prog ${tot.total > trip.budget ? "over" : ""}"><i style="width:${pct}%"></i></div>` : `<div style="height:14px"></div>`}
         <div class="meta"><span>${trip.budget ? t("t.budget", { v: fmtMoney(trip.budget, trip.cur) }) : t("t.noBudget")}</span>
-          <span>${tot.total ? t("t.perDay", { v: fmtMoney(tot.total / elapsed, trip.cur) }) : ""}</span></div>
+          <span>${!trip.budget ? "" : tot.total > trip.budget ? t("t.over", { v: fmtMoney(tot.total - trip.budget, trip.cur) }) : t("t.left", { v: fmtMoney(trip.budget - tot.total, trip.cur) })}</span></div>
         ${tot.personal ? `<div class="pers">${t("t.personal", { v: fmtMoney(tot.personal, trip.cur) })}</div>` : ""}
       </div>
       ${isCur && gpsSuggest && gpsSuggest !== here ? `<button class="banner" data-act="gpsSwitch"><span class="flag">📍</span><div>${esc(t("t.here", { c: cname(gpsSuggest) }))}<span>${META[gpsSuggest][2]}${rateLine(META[gpsSuggest][2], trip.cur, " · ")}</span></div><b>${t("t.switch")}</b></button>` : ""}
       ${isCur ? `<button class="banner" data-act="pickHere"><span class="flag">${here ? flag(here) : "🌍"}</span><div>${here ? esc(t("t.now", { c: cname(here) })) : t("t.pick")}<span>${here ? trip.currency || META[here][2] : ""}${here ? rateLine(trip.currency || META[here][2], trip.cur, " · ") : ""}</span></div><span class="go muted" style="font-size:20px">›</span></button>` : ""}
+      ${exps.length ? summaryStrip(trip, tot, elapsed, days, td) : ""}
       ${catSum.length ? `<div class="cats">${catSum.map(([k, v]) => `<i style="flex:${v};background:${CAT[k].c}"></i>`).join("")}</div>
         <div class="catleg">${catSum.slice(0, 6).map(([k, v]) => `<span><i style="background:${CAT[k].c}"></i>${t("cat." + k)} ${v / tot.total < .01 ? "<1" : Math.round(v / tot.total * 100)}%</span>`).join("")}</div>` : ""}
       ${groups.length ? groups.map(g => {
@@ -1316,6 +1280,14 @@ function renderTrip() {
       }).join("") : `<div class="empty">${t("t.noExp")}</div>`}
       ${!viewTripId && past.length ? `<div class="h4"><b>${t("t.past")}</b></div>${tripList(past)}` : ""}
     </div>`;
+}
+/** Today / total / average per day, shown once above the expense list. */
+function summaryStrip(trip, tot, elapsed, days, td) {
+  const running = (!trip.from || trip.from <= td) && (!trip.to || td <= trip.to);
+  const todaySum = tripExp(trip.id).filter(e => !e.personal && e.date === td).reduce((s, e) => s + e.homeAmount, 0);
+  const cells = running ? [[t("t.today"), fmtAmt(todaySum)], [t("t.total"), fmtAmt(tot.total)], [t("t.avg"), fmtAmt(tot.total / elapsed)]]
+    : [[t("t.total"), fmtAmt(tot.total)], [t("t.avg"), fmtAmt(tot.total / elapsed)], [t("t.days"), days ? fmtNum(days) : "–"]];
+  return `<div class="strip">${cells.map(([l, v], i) => `<div><span>${l}</span><b>${v}${running || i < 2 ? ` <small>${trip.cur}</small>` : ""}</b></div>`).join("")}</div>`;
 }
 function rateLine(from, to, pre) {
   if (from === to) return "";
@@ -1703,7 +1675,6 @@ function renderSettings() {
       <label class="set">${t("g.home")}<select data-sel="home">${CURRENCIES.map(c => `<option value="${c}" ${home === c ? "selected" : ""}>${c}</option>`).join("")}</select></label>
       <div class="set">${t("g.theme")}${seg("theme", [["system", t("g.sys")], ["light", t("g.light")], ["dark", t("g.dark")]])}</div>
       <div class="set">${t("g.palette")}${seg("palette", [["blue", t("g.blue")], ["rose", t("g.rose")], ["violet", t("g.violet")]])}</div>
-      <div class="set">${t("g.mapMode")}${seg("mapMode", [["globe", t("g.globe")], ["flat", t("g.flat")]])}</div>
     </div></div>
     <div class="group"><div class="lbl">${t("g.rates")}</div><div class="card" style="padding:2px 16px">
       <div class="set"><span style="font-weight:600;font-size:13px" class="muted">${S.rates ? esc(t("g.ratesAt", { date: fmtDate(S.rates.date, true) })) + " · " + S.rates.base : t("g.ratesNever")}</span>
@@ -1747,7 +1718,6 @@ function onSettingsClick(e) {
     S.settings[b.dataset.set] = b.dataset.v;
     save();
     if (b.dataset.set === "theme" || b.dataset.set === "palette") applyTheme();
-    if (b.dataset.set === "mapMode") { MAP.k = 1; MAP.setRegion(MAP.region, false); renderChips(); }
     renderSettings();
     return;
   }
@@ -1804,10 +1774,6 @@ async function wipe() {
 const ACTIONS = {
   tab: v => showTab(v),
   region: v => { MAP.setRegion(v); renderChips(); renderMapPanel(); },
-  toggleMode: () => {
-    S.settings.mapMode = S.settings.mapMode === "globe" ? "flat" : "globe";
-    save(); MAP.k = 1; MAP.setRegion(MAP.region, false); renderChips();
-  },
   togglePanel: () => { S.settings.panel = !S.settings.panel; save(); renderMapPanel(); },
   openList: () => openList(),
   openSettings: () => openSettings(),
