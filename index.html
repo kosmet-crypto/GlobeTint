@@ -422,7 +422,7 @@ const T = {
     "g.manual": "Ручни курсеви", "g.manualHint": "Имају предност над аутоматским. Корисно у мењачници или без интернета.",
     "g.add": "Додај", "g.data": "Подаци", "g.export": "Сачувај бекап", "g.import": "Врати из бекапа",
     "g.lastBackup": "Последњи бекап: {date}", "g.wipe": "Обриши све податке",
-    "g.wipeQ": "Трајно обрисати све земље, путовања и трошкове?", "g.about": "О апликацији", "g.version": "Верзија",
+    "g.wipeQ": "Трајно обрисати све земље, путовања и трошкове?", "g.about": "О апликацији", "g.version": "Верзија", "g.author": "Аутор", "g.mapData": "Подаци мапе",
     "g.update": "Провери ажурирања", "g.importQ": "Заменити тренутне податке подацима из бекапа?",
     "g.importOk": "Подаци су враћени", "g.importBad": "Ово није GlobeTint бекап", "g.saved": "Бекап је сачуван",
     "x.ratesOk": "Курсеви су ажурирани", "x.ratesFail": "Курсеви нису преузети. Има ли интернета?",
@@ -477,7 +477,7 @@ const T = {
     "g.manual": "Manual rates", "g.manualHint": "They take priority over automatic rates. Handy at the exchange office or offline.",
     "g.add": "Add", "g.data": "Data", "g.export": "Save backup", "g.import": "Restore from backup",
     "g.lastBackup": "Last backup: {date}", "g.wipe": "Delete all data",
-    "g.wipeQ": "Permanently delete all countries, trips and expenses?", "g.about": "About", "g.version": "Version",
+    "g.wipeQ": "Permanently delete all countries, trips and expenses?", "g.about": "About", "g.version": "Version", "g.author": "Made by", "g.mapData": "Map data",
     "g.update": "Check for updates", "g.importQ": "Replace the current data with the backup?",
     "g.importOk": "Data restored", "g.importBad": "This is not a GlobeTint backup", "g.saved": "Backup saved",
     "x.ratesOk": "Exchange rates updated", "x.ratesFail": "Could not download rates. Are you online?",
@@ -532,7 +532,7 @@ const T = {
     "g.manual": "Manuelle kurser", "g.manualHint": "Går foran de automatiske. Nyttig på vekslingskontoret eller uten nett.",
     "g.add": "Legg til", "g.data": "Data", "g.export": "Lagre sikkerhetskopi", "g.import": "Gjenopprett fra sikkerhetskopi",
     "g.lastBackup": "Siste sikkerhetskopi: {date}", "g.wipe": "Slett alle data",
-    "g.wipeQ": "Slette alle land, reiser og utgifter permanent?", "g.about": "Om appen", "g.version": "Versjon",
+    "g.wipeQ": "Slette alle land, reiser og utgifter permanent?", "g.about": "Om appen", "g.version": "Versjon", "g.author": "Laget av", "g.mapData": "Kartdata",
     "g.update": "Se etter oppdateringer", "g.importQ": "Erstatte dataene med sikkerhetskopien?",
     "g.importOk": "Data gjenopprettet", "g.importBad": "Dette er ikke en GlobeTint-sikkerhetskopi", "g.saved": "Sikkerhetskopi lagret",
     "x.ratesOk": "Valutakursene er oppdatert", "x.ratesFail": "Kunne ikke hente kurser. Er du på nett?",
@@ -1653,6 +1653,7 @@ function download(url, name) {
 }
 
 /* ---------------- Settings ---------------- */
+const AUTHOR = "Ivan St. – Srbija/Norge";
 let settingsEl = null;
 function openSettings() {
   settingsEl = pushLayer(`<header class="top"><button class="iconbtn" data-close><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
@@ -1691,10 +1692,11 @@ function renderSettings() {
       <button class="set" data-g="wipe" style="color:#E5484D">${t("g.wipe")}</button>
     </div></div>
     <div class="group"><div class="lbl">${t("g.about")}</div><div class="card" style="padding:2px 16px">
+      <div class="set">${t("g.author")}<span class="val">${esc(AUTHOR)}</span></div>
       <div class="set">${t("g.version")}<span class="val">${esc(version || "web")}</span></div>
       ${AND?.checkForUpdate ? `<button class="set" data-g="update">${t("g.update")}<span class="val">›</span></button>` : ""}
     </div></div>
-    <div class="note" style="text-align:center;margin-top:24px">GlobeTint · Natural Earth</div>`;
+    <div class="note" style="text-align:center;margin-top:24px">GlobeTint · ${esc(AUTHOR)}<br>${t("g.mapData")}: Natural Earth</div>`;
 }
 function onSettingsChange(e) {
   const k = e.target.dataset.sel;
