@@ -49,3 +49,7 @@
 * `vendor/`: d3-geo, d3-array, topojson-client. `fonts/`: Manrope.
 * `android/`: WebView омотач. Локално: `cd android && ./gradlew assembleRelease`.
 * `design/`: први нацрт изгледа.
+
+## Аутор
+
+Ivan St. – Srbija/Norge
