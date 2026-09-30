@@ -235,9 +235,13 @@ textarea.inp{height:76px;padding:12px 14px;resize:none}
 .conv{text-align:center;font-size:14px;font-weight:700;color:var(--accent);display:block;margin:2px auto 0}
 .conv span{color:var(--muted);font-weight:600}
 .conv.warn{color:#E5484D}
-.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin:14px 0 12px}
-.grid button{display:flex;flex-direction:column;align-items:center;gap:4px;padding:9px 0 7px;border-radius:15px;background:var(--chip);font-size:10.5px;font-weight:700;color:var(--muted);text-align:center;line-height:1.15;min-width:0}
-.grid button em{font-style:normal;font-size:22px}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin:14px 0 12px}
+.grid button{display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 0 6px;border-radius:15px;background:var(--chip);font-size:10.5px;font-weight:700;color:var(--muted);text-align:center;line-height:1.15;min-width:0}
+.grid button em{font-style:normal;font-size:20px}
+.mis{display:block;margin:8px auto 0;background:color-mix(in srgb,var(--wish) 16%,var(--card));color:var(--ink);font-size:12px;font-weight:700;padding:7px 12px;border-radius:12px}
+.mis b{color:var(--accent)}
+.destbtn{display:flex;align-items:center;gap:10px;text-align:left;width:100%}
+.destbtn .fl{font-size:22px}.destbtn .ph{color:var(--muted)}
 .grid button.on{background:var(--ink);color:var(--bg)}
 .opts{display:flex;gap:8px;align-items:center}
 .mini{display:flex;background:var(--chip);border-radius:12px;padding:3px}
@@ -365,7 +369,7 @@ const REGIONS = {
 
 const CATS = [
   ["food", "🍽️", "#FFB547"], ["fast", "🍔", "#FF8A3D"], ["grocery", "🛒", "#A17BF5"], ["stay", "🏨", "#6C8CFF"],
-  ["transport", "🚆", "#22B573"], ["culture", "🏛️", "#FF6F91"], ["souvenir", "🎁", "#F2C94C"], ["clothes", "👕", "#3CC6D6"],
+  ["transport", "🚆", "#22B573"], ["flight", "✈️", "#4FA3E0"], ["culture", "🏛️", "#FF6F91"], ["souvenir", "🎁", "#F2C94C"], ["clothes", "👕", "#3CC6D6"],
   ["tech", "📱", "#5B6B85"], ["other", "✨", "#9AA3B2"],
 ];
 const CAT = Object.fromEntries(CATS.map(([k, e, c]) => [k, { e, c }]));
@@ -397,7 +401,7 @@ const T = {
     "t.ended": "Завршено", "t.budget": "Буџет {v}", "t.noBudget": "Без буџета", "t.left": "Остаје {v}", "t.over": "Преко буџета {v}", "t.total": "Укупно", "t.avg": "Просек / дан", "t.days": "Дана",
     "t.personal": "Личне куповине: {v}", "t.today": "Данас", "t.yesterday": "Јуче",
     "t.noExp": "Још нема трошкова. Додај први на дугме +.",
-    "t.here": "Твоја локација: {c}", "t.switch": "Пребаци", "t.now": "Тренутно: {c}", "t.pick": "Изабери земљу у којој си",
+    "t.here": "Твоја локација: {c}", "t.switch": "Пребаци", "t.now": "Земља путовања: {c}", "t.pick": "Изабери земљу путовања", "t.dest": "Земља путовања", "t.destAuto": "Препознато из назива, тапни да промениш", "e.localCur": "{c}: локална валута је {cur}", "e.switchCur": "Пребаци",
     "t.edit": "Измени путовање", "t.end": "Заврши путовање", "t.del": "Обриши путовање", "t.resume": "Настави ово путовање",
     "t.delQ": "Обрисати путовање и све његове трошкове?", "t.new": "Ново путовање",
     "t.name": "Назив", "t.namePh": "нпр. Лето у Грчкој", "t.budgetL": "Буџет у {cur} (опционо)",
@@ -407,7 +411,7 @@ const T = {
     "e.homeAmt": "Износ у {cur}", "e.homeHint": "нпр. колико је банка стварно скинула",
     "e.card": "Картица", "e.cash": "Готовина", "e.personal": "Лична куповина", "e.note": "Белешка (опционо)",
     "e.delete": "Обриши трошак", "e.tag": "ЛИЧНО", "e.rateOf": "курс од {date}", "e.more": "Износ у {cur}, белешка",
-    "cat.food": "Ресторан", "cat.fast": "Брза храна", "cat.grocery": "Намирнице", "cat.stay": "Смештај", "cat.transport": "Превоз",
+    "cat.food": "Ресторан", "cat.fast": "Брза храна", "cat.grocery": "Намирнице", "cat.stay": "Смештај", "cat.transport": "Превоз", "cat.flight": "Лет",
     "cat.culture": "Музеји", "cat.souvenir": "Сувенири", "cat.clothes": "Одећа", "cat.tech": "Техника", "cat.other": "Остало",
     "s.title": "Статистика", "s.countries": "Земље", "s.conts": "Континенти", "s.trips": "Путовања", "s.spent": "Потрошено",
     "s.year": "+{n} ове године", "s.missing": "фали: {list}", "s.allConts": "сви обиђени", "s.onRoad": "{days} на путу",
@@ -452,7 +456,7 @@ const T = {
     "t.ended": "Finished", "t.budget": "Budget {v}", "t.noBudget": "No budget", "t.left": "{v} left", "t.over": "{v} over budget", "t.total": "Total", "t.avg": "Avg / day", "t.days": "Days",
     "t.personal": "Personal purchases: {v}", "t.today": "Today", "t.yesterday": "Yesterday",
     "t.noExp": "No expenses yet. Add the first one with the + button.",
-    "t.here": "Your location: {c}", "t.switch": "Switch", "t.now": "Now: {c}", "t.pick": "Choose the country you are in",
+    "t.here": "Your location: {c}", "t.switch": "Switch", "t.now": "Trip country: {c}", "t.pick": "Choose the trip country", "t.dest": "Trip country", "t.destAuto": "Recognised from the name, tap to change", "e.localCur": "{c} uses {cur}", "e.switchCur": "Switch",
     "t.edit": "Edit trip", "t.end": "Finish trip", "t.del": "Delete trip", "t.resume": "Continue this trip",
     "t.delQ": "Delete this trip and all its expenses?", "t.new": "New trip",
     "t.name": "Name", "t.namePh": "e.g. Summer in Greece", "t.budgetL": "Budget in {cur} (optional)",
@@ -462,7 +466,7 @@ const T = {
     "e.homeAmt": "Amount in {cur}", "e.homeHint": "e.g. what the bank actually charged",
     "e.card": "Card", "e.cash": "Cash", "e.personal": "Personal purchase", "e.note": "Note (optional)",
     "e.delete": "Delete expense", "e.tag": "PERSONAL", "e.rateOf": "rate from {date}", "e.more": "Amount in {cur}, note",
-    "cat.food": "Restaurant", "cat.fast": "Fast food", "cat.grocery": "Groceries", "cat.stay": "Lodging", "cat.transport": "Transport",
+    "cat.food": "Restaurant", "cat.fast": "Fast food", "cat.grocery": "Groceries", "cat.stay": "Lodging", "cat.transport": "Transport", "cat.flight": "Flight",
     "cat.culture": "Museums", "cat.souvenir": "Souvenirs", "cat.clothes": "Clothes", "cat.tech": "Tech", "cat.other": "Other",
     "s.title": "Stats", "s.countries": "Countries", "s.conts": "Continents", "s.trips": "Trips", "s.spent": "Spent",
     "s.year": "+{n} this year", "s.missing": "missing: {list}", "s.allConts": "all visited", "s.onRoad": "{days} on the road",
@@ -507,7 +511,7 @@ const T = {
     "t.ended": "Avsluttet", "t.budget": "Budsjett {v}", "t.noBudget": "Uten budsjett", "t.left": "{v} igjen", "t.over": "{v} over budsjett", "t.total": "Totalt", "t.avg": "Snitt / dag", "t.days": "Dager",
     "t.personal": "Personlige kjøp: {v}", "t.today": "I dag", "t.yesterday": "I går",
     "t.noExp": "Ingen utgifter ennå. Legg til den første med +-knappen.",
-    "t.here": "Din posisjon: {c}", "t.switch": "Bytt", "t.now": "Nå: {c}", "t.pick": "Velg landet du er i",
+    "t.here": "Din posisjon: {c}", "t.switch": "Bytt", "t.now": "Reiseland: {c}", "t.pick": "Velg reiseland", "t.dest": "Reiseland", "t.destAuto": "Gjenkjent fra navnet, trykk for å endre", "e.localCur": "{c} bruker {cur}", "e.switchCur": "Bytt",
     "t.edit": "Endre reise", "t.end": "Avslutt reise", "t.del": "Slett reise", "t.resume": "Fortsett denne reisen",
     "t.delQ": "Slette reisen og alle utgiftene?", "t.new": "Ny reise",
     "t.name": "Navn", "t.namePh": "f.eks. Sommer i Hellas", "t.budgetL": "Budsjett i {cur} (valgfritt)",
@@ -517,7 +521,7 @@ const T = {
     "e.homeAmt": "Beløp i {cur}", "e.homeHint": "f.eks. det banken faktisk trakk",
     "e.card": "Kort", "e.cash": "Kontant", "e.personal": "Personlig kjøp", "e.note": "Notat (valgfritt)",
     "e.delete": "Slett utgift", "e.tag": "PERSONLIG", "e.rateOf": "kurs fra {date}", "e.more": "Beløp i {cur}, notat",
-    "cat.food": "Restaurant", "cat.fast": "Gatekjøkken", "cat.grocery": "Dagligvarer", "cat.stay": "Overnatting", "cat.transport": "Transport",
+    "cat.food": "Restaurant", "cat.fast": "Gatekjøkken", "cat.grocery": "Dagligvarer", "cat.stay": "Overnatting", "cat.transport": "Transport", "cat.flight": "Fly",
     "cat.culture": "Museer", "cat.souvenir": "Suvenirer", "cat.clothes": "Klær", "cat.tech": "Elektronikk", "cat.other": "Annet",
     "s.title": "Statistikk", "s.countries": "Land", "s.conts": "Kontinenter", "s.trips": "Reiser", "s.spent": "Brukt",
     "s.year": "+{n} i år", "s.missing": "mangler: {list}", "s.allConts": "alle besøkt", "s.onRoad": "{days} på reise",
@@ -1257,7 +1261,7 @@ function renderTrip() {
       <button class="iconbtn" data-act="tripMenu"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="19" cy="12" r="1.3"/></svg></button></header>
     <div class="pad">
       <div class="hero">
-        <div class="hrow"><span>${cc.map(flag).join(" ")}${cc.length ? " · " : ""}${esc(fmtRange(trip.from, trip.to))}</span><span>${esc(when)}</span></div>
+        <div class="hrow"><span>${(cc.length ? cc : trip.country ? [trip.country] : []).map(flag).join(" ")}${cc.length || trip.country ? " · " : ""}${esc(fmtRange(trip.from, trip.to))}</span><span>${esc(when)}</span></div>
         <h3>${esc(trip.name)}</h3>
         <div class="sum">${fmtAmt(tot.total)} <small>${trip.cur}</small></div>
         ${trip.budget ? `<div class="prog ${tot.total > trip.budget ? "over" : ""}"><i style="width:${pct}%"></i></div>` : `<div style="height:14px"></div>`}
@@ -1303,24 +1307,146 @@ function tripList(trips) {
       <div class="amt">${fmtAmt(tot.total)}<span class="muted">${tr.cur}</span></div></button>`;
   }).join("")}</div>`;
 }
+/* ---------------- Trip country from its name ----------------
+   Matches country names (sr/en/nb) and popular destinations in any script:
+   everything is compared as plain Latin ("Будимпешта" → "budimpesta"). */
+const CYR = { а: "a", б: "b", в: "v", г: "g", д: "d", ђ: "dj", е: "e", ж: "z", з: "z", и: "i", ј: "j", к: "k", л: "l", љ: "lj", м: "m",
+  н: "n", њ: "nj", о: "o", п: "p", р: "r", с: "s", т: "t", ћ: "c", у: "u", ф: "f", х: "h", ц: "c", ч: "c", џ: "dz", ш: "s",
+  й: "j", ы: "y", э: "e", ю: "ju", я: "ja", ь: "", ъ: "" };
+const plain = s => String(s || "").toLowerCase().replace(/[\u0400-\u04ff]/g, c => CYR[c] ?? c)
+  .replace(/đ/g, "dj").replace(/ø/g, "o").replace(/æ/g, "ae").replace(/ß/g, "ss")
+  .normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, " ").trim();
+const PLACES = `FR:paris|pariz|nica|lyon|lion|marseille|marsej|provence|provansa|azurna obala
+IT:rome|roma|rim|milan|milano|venice|venezia|venecija|florence|firenze|firenca|napoli|naples|napulj|pisa|verona|bologna|bolonja|torino|turin|como|sicily|sicilia|sicilija|sardinia|sardegna|sardinija|toscana|tuscany|toskana
+ES:madrid|barcelona|barselona|sevilla|seville|sevilja|valencia|valensija|malaga|ibiza|mallorca|majorka|tenerife|gran canaria|kanari
+PT:lisbon|lisboa|lisabon|porto|madeira|algarve
+GB:london|edinburgh|edinburg|manchester|mancester|liverpool|liverpul
+IE:dublin
+NL:amsterdam|rotterdam
+BE:brussels|bruxelles|brisel|brugge|bruges
+DE:berlin|munich|munchen|minhen|hamburg|frankfurt|koln|cologne|keln
+AT:vienna|wien|bec|salzburg|salcburg|innsbruck|inzbruk
+CH:zurich|cirih|geneva|geneve|zeneva|bern|luzern|interlaken
+CZ:prague|praha|prag
+HU:budapest|budimpesta|balaton
+PL:warsaw|warszawa|varsava|krakow|krakov
+SK:bratislava
+SI:ljubljana|bled|piran|portoroz
+HR:zagreb|split|dubrovnik|zadar|pula|rovinj|hvar|makarska|istra
+BA:sarajevo|mostar|banja luka|jahorina
+ME:podgorica|budva|kotor|herceg novi|ulcinj|zabljak|petrovac
+RS:beograd|belgrade|novi sad|zlatibor|kopaonik
+MK:skopje|skoplje|ohrid
+AL:tirana|sarande|saranda|ksamil|durres|drac
+GR:athens|atina|thessaloniki|solun|santorini|crete|krit|rhodes|rodos|corfu|krf|halkidiki|lefkada|zakynthos|zakintos|thassos|tasos|mykonos|mikonos|paralia|olimpska rivijera
+BG:sofia|sofija|varna|burgas|sunny beach|suncev breg
+RO:bucharest|bukurest|brasov
+TR:istanbul|antalya|antalija|izmir|bodrum|alanya|alanja|kemer|cappadocia|kapadokija
+CY:larnaca|larnaka|paphos|pafos|limassol|ayia napa|aja napa
+DK:copenhagen|kobenhavn|kopenhagen
+SE:stockholm|stokholm|gothenburg|goteborg|geteborg
+NO:oslo|bergen|tromso|stavanger|trondheim|lofoten
+FI:helsinki|lapland|laponija
+IS:reykjavik|rejkjavik
+EE:tallinn|talin
+LV:riga
+LT:vilnius
+UA:kyiv|kijev|lviv|lavov
+MT:valletta|valeta
+US:new york|njujork|los angeles|san francisco|miami|majami|las vegas|chicago|cikago|hawaii|havaji|boston|washington|vasington|florida
+CA:toronto|vancouver|vankuver|montreal
+MX:cancun|kankun|mexico city
+CU:havana
+BR:rio de janeiro|sao paulo
+AR:buenos aires
+PE:cusco|kusko|machu picchu|macu picu
+AE:dubai|abu dhabi|abu dabi
+EG:cairo|kairo|hurghada|hurgada|sharm el sheikh|sarm el seik
+MA:marrakech|marrakesh|marakes|casablanca|kazablanka
+TN:tunis|djerba|dzerba|hammamet|hamamet|sousse|monastir
+TH:bangkok|phuket|puket|krabi|koh samui|chiang mai|pattaya|pataja
+JP:tokyo|tokio|kyoto|kjoto|osaka
+CN:beijing|peking|shanghai|sangaj
+KR:seoul|seul
+SG:singapore|singapur
+ID:bali|jakarta
+VN:hanoi|ho chi minh
+IN:delhi|mumbai|goa
+MV:maldives|maldivi
+AU:sydney|sidnej|melbourne|melburn
+NZ:auckland|okland
+ZA:cape town|johannesburg
+KE:nairobi
+TZ:zanzibar
+IL:jerusalem|jerusalim|tel aviv
+JO:amman|wadi rum
+QA:doha`.split("\n").flatMap(l => { const [c, names] = l.split(":"); return names.split("|").map(n => [n, c]); });
+let COUNTRY_KEYS = null;
+function countryKeys() {
+  if (COUNTRY_KEYS) return COUNTRY_KEYS;
+  const dn = {};
+  for (const [lang, loc] of [["sr", "sr-Cyrl-RS"], ["nb", "nb-NO"]]) { try { dn[lang] = new Intl.DisplayNames([loc], { type: "region" }); } catch (e) {} }
+  COUNTRY_KEYS = [];
+  for (const code of Object.keys(META)) {
+    const names = new Set([META[code][3], NAME_FIX.sr[code], NAME_FIX.nb[code]]);
+    for (const d of Object.values(dn)) { try { names.add(d.of(code)); } catch (e) {} }
+    for (const n of names) { const k = plain(n); if (k.length >= 4) COUNTRY_KEYS.push([k, code]); }
+  }
+  return COUNTRY_KEYS;
+}
+function detectCountry(text) {
+  const words = plain(text).split(" ").filter(Boolean);
+  if (!words.length) return null;
+  const q = " " + words.join(" ") + " ";
+  // Serbian and Norwegian endings: "Грчкој", "Будимпешти", "Italiji" still match.
+  const hit = key => {
+    if (q.includes(" " + key + " ")) return true;
+    if (key.length < 5 || key.includes(" ") || !/[aeiou]$/.test(key)) return false;
+    const stem = key.slice(0, -1);
+    return words.some(w => w.startsWith(stem) && w.length <= key.length + 2);
+  };
+  let best = null, len = 0;
+  for (const [key, code] of [...PLACES, ...countryKeys()]) if (key.length > len && hit(key)) { best = code; len = key.length; }
+  return best;
+}
 function openTripForm(trip) {
   const home = trip ? trip.cur : S.settings.home;
   const el = pushLayer(`<div class="grab"></div><div class="stitle">${trip ? t("t.edit") : t("t.new")}</div>
     <label class="field"><span>${t("t.name")}</span><input class="inp" id="tn" placeholder="${esc(t("t.namePh"))}" value="${esc(trip?.name || "")}"></label>
+    <div class="field"><span>${t("t.dest")}</span><button class="inp destbtn" id="td"></button><div class="note" id="tdh" style="margin-top:6px"></div></div>
     <div class="two"><label class="field"><span>${t("v.from")}</span><input class="inp" type="date" id="tf" value="${trip?.from || today()}"></label>
     <label class="field"><span>${t("v.to")}</span><input class="inp" type="date" id="tt" value="${trip?.to || ""}"></label></div>
     <label class="field"><span>${t("t.budgetL", { cur: home })}</span><input class="inp" id="tb" inputmode="decimal" value="${trip?.budget ? String(trip.budget).replace(".", decSep()) : ""}"></label>
     <div class="actions"><button class="btn" id="tsave">${t("b.save")}</button>
     ${trip ? `<button class="btn danger" id="tdel">${t("t.del")}</button>` : ""}</div>`, "sheet");
+  // Trip country: from the name ("Budapest", "Будимпешта" → Hungary), from GPS, or picked by hand.
+  const fallback = trip?.country || gpsSuggest || null;
+  let dest = fallback, auto = false, manual = !!trip?.country;
+  const drawDest = () => {
+    $("#td", el).innerHTML = dest
+      ? `<span class="fl">${flag(dest)}</span><span>${esc(cname(dest))} · ${META[dest][2] || ""}</span>`
+      : `<span class="fl">🌍</span><span class="ph">${t("t.pick")}</span>`;
+    $("#tdh", el).textContent = auto ? "✨ " + t("t.destAuto") : "";
+  };
+  drawDest();
+  $("#tn", el).addEventListener("input", e => {
+    if (manual) return;
+    const found = detectCountry(e.target.value);
+    if (found) { dest = found; auto = true; }
+    else if (auto) { dest = fallback; auto = false; }
+    drawDest();
+  });
+  $("#td", el).addEventListener("click", () => openList(code => { dest = code; auto = false; manual = true; drawDest(); }, t("t.pick")));
   $("#tf", el).addEventListener("change", e => { if ($("#tt", el).value && $("#tt", el).value < e.target.value) $("#tt", el).value = e.target.value; });
   $("#tsave", el).addEventListener("click", () => {
     let from = $("#tf", el).value, to = $("#tt", el).value;
     if (from && to && to < from) [from, to] = [to, from];
     const data = { name: $("#tn", el).value.trim() || t("t.defName"), from, to, budget: parseNum($("#tb", el).value) || 0 };
+    if (dest && (!trip || dest !== trip.country)) { data.country = dest; data.currency = META[dest][2] || (trip ? trip.cur : S.settings.home); }
     if (trip) Object.assign(trip, data);
     else {
-      const nt = { id: uid(), cur: S.settings.home, country: S.settings.lastCountry || null, created: Date.now(), ...data };
-      if (gpsSuggest) nt.country = gpsSuggest;
+      const nt = { id: uid(), cur: S.settings.home, country: null, created: Date.now(), ...data };
+      if (nt.country) S.settings.lastCountry = nt.country;
       S.trips.push(nt);
       S.settings.currentTrip = nt.id;
       viewTripId = null;
@@ -1423,6 +1549,7 @@ function openExpense(id) {
         <label>${esc(x.date === today() ? t("t.today") : fmtDate(x.date))} ▾<input type="date" id="xd" value="${x.date}"></label></div>
       <div class="amount ${a ? "" : "zero"}">${a ? esc(x.amt) : "0"} <small>${x.currency}</small></div>
       ${conv}
+      ${x.country && META[x.country][2] && x.currency !== META[x.country][2] ? `<button class="mis" data-x="fixcur">⚠️ ${esc(t("e.localCur", { c: cname(x.country), cur: META[x.country][2] }))} · <b>${t("e.switchCur")}</b></button>` : ""}
       <div class="grid">${CATS.map(([k, e]) => `<button class="${x.cat === k ? "on" : ""}" data-cat="${k}"><em>${e}</em>${t("cat." + k)}</button>`).join("")}</div>
       <div class="opts"><div class="mini"><button class="${x.pay === "card" ? "on" : ""}" data-pay="card">${t("e.card")}</button><button class="${x.pay === "cash" ? "on" : ""}" data-pay="cash">${t("e.cash")}</button></div>
         <button class="sw ${x.personal ? "on" : ""}" data-x="personal">${t("e.personal")}<i></i></button></div>
@@ -1431,7 +1558,7 @@ function openExpense(id) {
         <label class="field"><span>${t("e.note")}</span><input class="inp" id="xn" value="${esc(x.note)}"></label></div>` :
         `<button class="note" data-x="more" style="display:block;margin:10px auto 0;color:var(--accent);font-weight:700">+ ${t("e.more", { cur: trip.cur })}</button>`}
       <div class="keys">${["1","2","3","4","5","6","7","8","9",decSep(),"0","⌫"].map(k => `<button data-k="${k}">${k}</button>`).join("")}</div>
-      <div class="actions"><button class="btn" id="xsave" ${a > 0 && x.cat && hv != null && x.country ? "" : "disabled"}>${t("b.save")}</button>
+      <div class="actions"><button class="btn" id="xsave" ${a > 0 && hv != null && x.country ? "" : "disabled"}>${t("b.save")}</button>
       ${old ? `<button class="btn danger" data-x="del">${t("e.delete")}</button>` : ""}</div>`;
     $("#xd", el).addEventListener("change", e => { if (e.target.value) { x.date = e.target.value; draw(); } });
     const xh = $("#xh", el), xn = $("#xn", el);
@@ -1440,7 +1567,7 @@ function openExpense(id) {
   };
   const updateSave = () => {
     const hv = homeVal();
-    $("#xsave", el).disabled = !(amount() > 0 && x.cat && hv != null && x.country);
+    $("#xsave", el).disabled = !(amount() > 0 && hv != null && x.country);
   };
   draw();
   el.addEventListener("click", async e => {
@@ -1465,6 +1592,7 @@ function openExpense(id) {
     if (act === "more") { x.more = true; draw(); }
     if (act === "country") openList(code => { x.country = code; x.currency = META[code][2] || x.currency; x.homeOverride = ""; draw(); }, t("t.pick"));
     if (act === "cur") pickCurrency(c => { x.currency = c; x.homeOverride = ""; draw(); });
+    if (act === "fixcur") { x.currency = META[x.country][2]; x.homeOverride = ""; draw(); }
     if (act === "del") {
       S.expenses = S.expenses.filter(z => z.id !== old.id);
       syncTripVisits(trip.id);
@@ -1472,12 +1600,12 @@ function openExpense(id) {
     }
     if (e.target.closest("#xsave")) {
       const a = amount(), hv = homeVal();
-      if (!(a > 0 && x.cat && hv != null && x.country)) return;
+      if (!(a > 0 && hv != null && x.country)) return;
       const manualHome = parseNum(x.homeOverride) > 0;
       const rec = {
         tripId: trip.id, date: x.date, country: x.country, currency: x.currency, amount: a,
         rate: manualHome ? hv / a : (x.currency === trip.cur ? 1 : rate()), tripCur: trip.cur,
-        homeAmount: Math.round(hv * 100) / 100, manualHome, cat: x.cat, pay: x.pay, personal: x.personal, note: x.note.trim(),
+        homeAmount: Math.round(hv * 100) / 100, manualHome, cat: x.cat || "other", pay: x.pay, personal: x.personal, note: x.note.trim(),
       };
       if (old) Object.assign(old, rec);
       else S.expenses.push({ id: uid(), t: Date.now(), ...rec });
