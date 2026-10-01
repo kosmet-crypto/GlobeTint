@@ -43,6 +43,7 @@ final class Strings {
                 "Oppdateringen mislyktes. Prøv igjen senere.");
         put("backupSaved", "Backup saved", "Бекап је сачуван", "Sikkerhetskopi lagret");
         put("imageSaved", "Image saved", "Слика је сачувана", "Bildet er lagret");
+        put("fileSaved", "File saved", "Фајл је сачуван", "Filen er lagret");
         put("saveFailed", "Could not save the file", "Фајл није сачуван", "Kunne ikke lagre filen");
         put("noSaver", "No app available to save files", "Нема апликације за чување фајлова", "Ingen app for å lagre filer");
         put("shareFailed", "Could not share the image", "Слика није подељена", "Kunne ikke dele bildet");

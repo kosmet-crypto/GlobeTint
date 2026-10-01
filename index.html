@@ -58,7 +58,7 @@ main{flex:1;position:relative;overflow:hidden}
 .h1{font-size:26px;font-weight:800;letter-spacing:-.6px}
 .btns{display:flex;gap:8px}
 .iconbtn{width:42px;height:42px;border-radius:14px;background:var(--card);box-shadow:var(--shadow);display:grid;place-items:center;flex:none}
-.iconbtn svg,.ico{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.iconbtn svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 
 .chips{display:flex;gap:8px;padding:0 20px 8px;overflow-x:auto;scrollbar-width:none;flex:none}
 .chips::-webkit-scrollbar{display:none}
@@ -122,7 +122,6 @@ main{flex:1;position:relative;overflow:hidden}
 .btn.sec{background:var(--chip);color:var(--ink)}
 .btn.danger{background:transparent;color:#E5484D}
 .btn:disabled{opacity:.4}
-.row{display:flex;align-items:center;gap:12px}
 .empty{text-align:center;padding:28px 10px;color:var(--muted);font-size:14px;font-weight:600;line-height:1.5}
 .flag{font-size:30px;line-height:1}
 
@@ -181,7 +180,6 @@ main{flex:1;position:relative;overflow:hidden}
 .li .amt{text-align:right;font-size:14px;font-weight:800;flex:none}
 .li .amt span{display:block}
 .li .sd{width:10px;height:10px;border-radius:50%;flex:none}
-.li.cur{position:relative}
 .remind{display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:18px;background:color-mix(in srgb,var(--wish) 12%,var(--card));margin-bottom:12px;font-size:13px;font-weight:700}
 .remind div{flex:1}
 .remind button{background:var(--ink);color:var(--bg);font-size:12px;font-weight:800;padding:8px 12px;border-radius:10px}
@@ -284,6 +282,21 @@ textarea.inp{height:76px;padding:12px 14px;resize:none}
 #toast.on{opacity:1;transform:translate(-50%,0)}
 
 .shareimg{width:100%;border-radius:18px;display:block;margin:4px 0 14px;box-shadow:var(--shadow)}
+
+/* companions, cash, timeline, comparison */
+.chipset{display:flex;flex-wrap:wrap;gap:8px}
+.chipset .chip{font-size:14px;padding:9px 16px}
+.split{display:block;margin:10px auto 0;background:var(--chip);color:var(--ink);font-size:12px;font-weight:700;padding:7px 12px;border-radius:12px;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.addrow{display:grid;grid-template-columns:1fr auto auto;gap:8px;margin-top:12px}
+.addrow .btn{width:auto;height:48px;padding:0 16px;font-size:15px}
+.addrow .cur{height:48px;border-radius:14px;background:var(--chip);padding:0 14px;font-weight:800}
+.yr{display:flex;justify-content:space-between;align-items:baseline;margin:22px 4px 8px}
+.yr b{font-size:22px;font-weight:800;letter-spacing:-.4px}
+.yr span{font-size:12px;color:var(--muted);font-weight:700}
+.cmp{padding:14px 16px;margin-bottom:10px}
+.cmp .li{padding:0}
+.cmp .t{height:8px;border-radius:4px;background:var(--chip);margin:12px 0 10px;overflow:hidden}
+.cmp .t i{display:block;height:100%;border-radius:4px;background:linear-gradient(90deg,var(--v2),var(--v3))}
 </style>
 </head>
 <body>
@@ -352,8 +365,7 @@ for (const f of FEATURES) {
   if (!f.id || d3.geoArea(f) > 4e-5) continue;
   let g = f.geometry;
   if (g.type === "MultiPolygon") {
-    const best = g.coordinates.map(c => ({ type: "Polygon", coordinates: c })).sort((a, b) => d3.geoArea(b) - d3.geoArea(a))[0];
-    g = best;
+    g = g.coordinates.map(c => ({ type: "Polygon", coordinates: c })).sort((a, b) => d3.geoArea(b) - d3.geoArea(a))[0];
   }
   DOTS.push({ id: f.id, c: d3.geoCentroid(g) });
 }
@@ -430,6 +442,20 @@ const T = {
     "g.update": "Провери ажурирања", "g.importQ": "Заменити тренутне податке подацима из бекапа?",
     "g.importOk": "Подаци су враћени", "g.importBad": "Ово није GlobeTint бекап", "g.saved": "Бекап је сачуван",
     "x.ratesOk": "Курсеви су ажурирани", "x.ratesFail": "Курсеви нису преузети. Има ли интернета?",
+    "p.me": "Ја", "t.people": "Сапутници (опционо)", "t.peoplePh": "нпр. Ана, Марко",
+    "t.peopleQ": "Уклоњени сапутници се бришу и из поделе трошкова. Наставити?",
+    "sp.title": "Подела", "sp.paid": "Ко плаћа", "sp.among": "Дели се на", "sp.all": "сви", "sp.btn": "Плаћа: {who} · дели се: {list}",
+    "sp.paidBy": "плаћа: {who}", "sp.settle": "Поравнање", "sp.even": "Сви сте квит",
+    "sp.hint": "У укупно и буџет улази само твој део. Поравнање рачуна ко коме колико дугује.",
+    "cash.title": "Готовина", "cash.add": "Додај", "cash.amount": "Замена или подизање",
+    "cash.hint": "Упиши колико готовине стиже у новчаник (мењачница, банкомат). Трошкови плаћени готовином се одузимају сами. Замена није трошак.",
+    "cash.none": "Још нема уписане готовине.", "cash.left": "Остаје",
+    "t.csv": "Извези у CSV", "g.csv": "Извези трошкове (CSV)", "x.csvSaved": "Фајл је сачуван",
+    "csv.head": "Путовање|Датум|Земља|Категорија|Белешка|Износ|Валута|Курс|Износ ({cur})|Мој део ({cur})|Плаћање|Лично|Плаћа|Дели се",
+    "b.yesNo": "да",
+    "s.timeline": "Хронологија", "s.timelineSub": "Посете по годинама", "s.compare": "Поређење путовања", "s.compareSub": "Просек по дану и категорије",
+    "s.perDay": "{cur} / дан", "s.undated": "Без датума",
+    "pl.new": { one: "{n} нова", few: "{n} нове", other: "{n} нових" },
     "x.saved": "Сачувано", "x.imgSaved": "Слика је сачувана",
   },
   en: {
@@ -485,6 +511,20 @@ const T = {
     "g.update": "Check for updates", "g.importQ": "Replace the current data with the backup?",
     "g.importOk": "Data restored", "g.importBad": "This is not a GlobeTint backup", "g.saved": "Backup saved",
     "x.ratesOk": "Exchange rates updated", "x.ratesFail": "Could not download rates. Are you online?",
+    "p.me": "Me", "t.people": "Travel companions (optional)", "t.peoplePh": "e.g. Anna, Mark",
+    "t.peopleQ": "Removed companions are also taken out of shared expenses. Continue?",
+    "sp.title": "Split", "sp.paid": "Paid by", "sp.among": "Split between", "sp.all": "everyone", "sp.btn": "Paid by {who} · split: {list}",
+    "sp.paidBy": "paid by {who}", "sp.settle": "Settle up", "sp.even": "All square",
+    "sp.hint": "Only your part counts towards the total and the budget. Settle up shows who owes whom.",
+    "cash.title": "Cash", "cash.add": "Add", "cash.amount": "Exchange or withdrawal",
+    "cash.hint": "Enter the cash you get (exchange office, ATM). Expenses paid in cash are deducted automatically. An exchange is not an expense.",
+    "cash.none": "No cash recorded yet.", "cash.left": "Left",
+    "t.csv": "Export to CSV", "g.csv": "Export expenses (CSV)", "x.csvSaved": "File saved",
+    "csv.head": "Trip|Date|Country|Category|Note|Amount|Currency|Rate|Amount ({cur})|My part ({cur})|Payment|Personal|Paid by|Split between",
+    "b.yesNo": "yes",
+    "s.timeline": "Timeline", "s.timelineSub": "Visits by year", "s.compare": "Compare trips", "s.compareSub": "Average per day and categories",
+    "s.perDay": "{cur} / day", "s.undated": "No dates",
+    "pl.new": { one: "{n} new", other: "{n} new" },
     "x.saved": "Saved", "x.imgSaved": "Image saved",
   },
   nb: {
@@ -540,6 +580,20 @@ const T = {
     "g.update": "Se etter oppdateringer", "g.importQ": "Erstatte dataene med sikkerhetskopien?",
     "g.importOk": "Data gjenopprettet", "g.importBad": "Dette er ikke en GlobeTint-sikkerhetskopi", "g.saved": "Sikkerhetskopi lagret",
     "x.ratesOk": "Valutakursene er oppdatert", "x.ratesFail": "Kunne ikke hente kurser. Er du på nett?",
+    "p.me": "Meg", "t.people": "Reisefølge (valgfritt)", "t.peoplePh": "f.eks. Anna, Markus",
+    "t.peopleQ": "De som fjernes, tas også ut av delte utgifter. Fortsette?",
+    "sp.title": "Deling", "sp.paid": "Betalt av", "sp.among": "Deles mellom", "sp.all": "alle", "sp.btn": "Betalt av {who} · deles: {list}",
+    "sp.paidBy": "betalt av {who}", "sp.settle": "Oppgjør", "sp.even": "Alle er skuls",
+    "sp.hint": "Bare din del teller i totalen og budsjettet. Oppgjøret viser hvem som skylder hvem.",
+    "cash.title": "Kontanter", "cash.add": "Legg til", "cash.amount": "Veksling eller uttak",
+    "cash.hint": "Legg inn kontantene du får (vekslingskontor, minibank). Utgifter betalt kontant trekkes fra automatisk. Veksling er ikke en utgift.",
+    "cash.none": "Ingen kontanter registrert ennå.", "cash.left": "Igjen",
+    "t.csv": "Eksporter til CSV", "g.csv": "Eksporter utgifter (CSV)", "x.csvSaved": "Filen er lagret",
+    "csv.head": "Reise|Dato|Land|Kategori|Notat|Beløp|Valuta|Kurs|Beløp ({cur})|Min del ({cur})|Betaling|Personlig|Betalt av|Deles mellom",
+    "b.yesNo": "ja",
+    "s.timeline": "Tidslinje", "s.timelineSub": "Besøk per år", "s.compare": "Sammenlign reiser", "s.compareSub": "Snitt per dag og kategorier",
+    "s.perDay": "{cur} / dag", "s.undated": "Uten datoer",
+    "pl.new": { one: "{n} ny", other: "{n} nye" },
     "x.saved": "Lagret", "x.imgSaved": "Bildet er lagret",
   },
 };
@@ -771,9 +825,10 @@ function tripTotals(trip) {
   let total = 0, personal = 0;
   const byCat = {};
   for (const e of tripExp(trip.id)) {
-    if (e.personal) { personal += e.homeAmount; continue; }
-    total += e.homeAmount;
-    byCat[e.cat] = (byCat[e.cat] || 0) + e.homeAmount;
+    const mine = myShare(e);
+    if (e.personal) { personal += mine; continue; }
+    total += mine;
+    if (mine) byCat[e.cat] = (byCat[e.cat] || 0) + mine;
   }
   return { total, personal, byCat };
 }
@@ -802,6 +857,54 @@ function syncTripVisits(tripId) {
   }
 }
 function tripDays(trip) { return trip.from && trip.to ? dayDiff(trip.from, trip.to) + 1 : 0; }
+/** Days so far for a running trip, all days for a finished one (at least 1). */
+function tripElapsed(trip, td = today()) {
+  const days = tripDays(trip);
+  return trip.from ? Math.max(1, Math.min(days || 1e9, dayDiff(trip.from, td) + 1)) : 1;
+}
+
+/* ---------------- Travel companions ----------------
+   A trip may list companions (trip.people). An expense then carries paidBy
+   (a companion id; none = me) and split (who shares it; none = only me).
+   Totals and the budget count only my part. */
+const ME = "me";
+const splitOf = e => e.split?.length ? e.split : [ME];
+const myShare = e => splitOf(e).includes(ME) ? e.homeAmount / splitOf(e).length : 0;
+const personName = (trip, id) => !id || id === ME ? t("p.me") : trip.people?.find(p => p.id === id)?.name || "?";
+/** Who owes whom, as few payments as possible: [[from, to, amount]]. */
+function settleUp(trip) {
+  const bal = { [ME]: 0 };
+  for (const p of trip.people || []) bal[p.id] = 0;
+  for (const e of tripExp(trip.id)) {
+    if (!e.paidBy && !e.split) continue;
+    const sp = splitOf(e);
+    const by = e.paidBy || ME;
+    bal[by] = (bal[by] || 0) + e.homeAmount;
+    for (const id of sp) bal[id] = (bal[id] || 0) - e.homeAmount / sp.length;
+  }
+  const debt = Object.entries(bal).filter(([, v]) => v < -0.005).map(([id, v]) => [id, -v]);
+  const cred = Object.entries(bal).filter(([, v]) => v > 0.005);
+  const out = [];
+  for (const d of debt) for (const c of cred) {
+    const x = Math.min(d[1], c[1]);
+    if (x < 0.005) continue;
+    out.push([d[0], c[0], x]);
+    d[1] -= x; c[1] -= x;
+  }
+  return out;
+}
+const hasShared = trip => trip.people?.length && tripExp(trip.id).some(e => e.paidBy || e.split);
+
+/* ---------------- Cash ----------------
+   trip.cash lists exchanges/withdrawals; cash I paid is deducted per currency. */
+function cashLeft(trip) {
+  const left = {};
+  for (const c of trip.cash || []) left[c.currency] = (left[c.currency] || 0) + c.amount;
+  for (const e of tripExp(trip.id)) if (e.pay === "cash" && !e.paidBy && e.currency in left) left[e.currency] -= e.amount;
+  return left;
+}
+// Cash is counted to the cent, so it is shown with decimals.
+const fmtCash = left => Object.entries(left).map(([c, v]) => NF2.format(v) + " " + c).join(" · ");
 
 /* ---------------- Theme ---------------- */
 const mq = matchMedia("(prefers-color-scheme: dark)");
@@ -812,8 +915,7 @@ function applyTheme() {
   const bg = getComputedStyle(document.documentElement).getPropertyValue("--bg").trim();
   try { AND?.setBars?.(bg, th === "light"); } catch (e) {}
 }
-mq.addEventListener?.("change", () => { if (S.settings.theme === "system") { applyTheme(); } });
-const cssVar = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+mq.addEventListener?.("change", () => { if (S.settings.theme === "system") applyTheme(); });
 
 /* ---------------- Map ---------------- */
 const NS = "http://www.w3.org/2000/svg";
@@ -992,7 +1094,7 @@ function pushLayer(html, kind, onClose) {
     kind === "dialog" ? `<div class="scrim"></div><div class="dialog">${html}</div>` :
     `<div class="scrim"></div><div class="sheet ${kind === "tall" ? "tall" : ""}">${html}</div>`;
   $("#layer").appendChild(el);
-  const entry = { el, onClose, kind };
+  const entry = { el, onClose };
   stack.push(entry);
   const scrim = $(".scrim", el);
   // Ignore the click that a touch generates right after the tap that opened this layer.
@@ -1011,7 +1113,6 @@ function closeLayer(entry = stack[stack.length - 1]) {
   setTimeout(() => entry.el.remove(), 260);
   entry.onClose?.();
 }
-const top1 = () => stack[stack.length - 1];
 window.gtBack = () => {
   if (stack.length) { closeLayer(); return true; }
   if (curTab !== "map") { showTab("map"); return true; }
@@ -1245,7 +1346,7 @@ function renderTrip() {
   if (trip.from && td < trip.from) when = t("t.starts", { days: tn("pl.days", dayDiff(td, trip.from)) });
   else if (trip.to && td > trip.to) when = t("t.ended");
   else if (trip.from) when = t("t.day", { d: dayDiff(trip.from, td) + 1, n: days || "?" });
-  const elapsed = trip.from ? Math.max(1, Math.min(days || 1e9, dayDiff(trip.from, td) + 1)) : 1;
+  const elapsed = tripElapsed(trip, td);
   const pct = trip.budget ? Math.min(100, tot.total / trip.budget * 100) : 0;
   const here = trip.country;
   const isCur = trip.id === S.settings.currentTrip;
@@ -1272,23 +1373,39 @@ function renderTrip() {
       ${isCur && gpsSuggest && gpsSuggest !== here ? `<button class="banner" data-act="gpsSwitch"><span class="flag">📍</span><div>${esc(t("t.here", { c: cname(gpsSuggest) }))}<span>${META[gpsSuggest][2]}${rateLine(META[gpsSuggest][2], trip.cur, " · ")}</span></div><b>${t("t.switch")}</b></button>` : ""}
       ${isCur ? `<button class="banner" data-act="pickHere"><span class="flag">${here ? flag(here) : "🌍"}</span><div>${here ? esc(t("t.now", { c: cname(here) })) : t("t.pick")}<span>${here ? trip.currency || META[here][2] : ""}${here ? rateLine(trip.currency || META[here][2], trip.cur, " · ") : ""}</span></div><span class="go muted" style="font-size:20px">›</span></button>` : ""}
       ${exps.length ? summaryStrip(trip, tot, elapsed, days, td) : ""}
+      ${trip.cash?.length ? `<button class="banner" data-act="openCash"><span class="flag">💵</span><div>${t("cash.title")}<span>${esc(fmtCash(cashLeft(trip)))}</span></div><span class="go muted" style="font-size:20px">›</span></button>` : ""}
+      ${hasShared(trip) ? settleCard(trip) : ""}
       ${catSum.length ? `<div class="cats">${catSum.map(([k, v]) => `<i style="flex:${v};background:${CAT[k].c}"></i>`).join("")}</div>
         <div class="catleg">${catSum.slice(0, 6).map(([k, v]) => `<span><i style="background:${CAT[k].c}"></i>${t("cat." + k)} ${v / tot.total < .01 ? "<1" : Math.round(v / tot.total * 100)}%</span>`).join("")}</div>` : ""}
       ${groups.length ? groups.map(g => {
-        const sum = g.list.filter(e => !e.personal).reduce((s, e) => s + e.homeAmount, 0);
+        const sum = g.list.filter(e => !e.personal).reduce((s, e) => s + myShare(e), 0);
         return `<div class="day"><span>${esc(dayLabel(g.date))}</span><span>${fmtMoney(sum, trip.cur)}</span></div>` +
           g.list.map(e => `<button class="exp" data-act="editExpense" data-v="${e.id}"><span class="em">${CAT[e.cat]?.e || "✨"}</span>
           <div><strong>${esc(e.note || t("cat." + e.cat))}${e.personal ? `<span class="tag">${t("e.tag")}</span>` : ""}</strong>
-          <span>${flag(e.country)} ${fmtMoney(e.amount, e.currency)}${e.pay ? " · " + t(e.pay === "cash" ? "e.cash" : "e.card") : ""}</span></div>
-          <div class="amt"><strong>${fmtAmt(e.homeAmount)}</strong><span>${trip.cur}</span></div></button>`).join("");
+          <span>${flag(e.country)} ${fmtMoney(e.amount, e.currency)}${expDetail(trip, e)}</span></div>
+          <div class="amt"><strong>${fmtAmt(myShare(e))}</strong><span>${trip.cur}</span></div></button>`).join("");
       }).join("") : `<div class="empty">${t("t.noExp")}</div>`}
       ${!viewTripId && past.length ? `<div class="h4"><b>${t("t.past")}</b></div>${tripList(past)}` : ""}
     </div>`;
 }
+/** Payment, and for a shared expense who paid and between how many. */
+function expDetail(trip, e) {
+  const bits = [];
+  if (e.paidBy) bits.push(t("sp.paidBy", { who: personName(trip, e.paidBy) }));
+  else if (e.pay) bits.push(t(e.pay === "cash" ? "e.cash" : "e.card"));
+  if (splitOf(e).length > 1) bits.push("👥 ÷" + splitOf(e).length);
+  return bits.map(b => " · " + esc(b)).join("");
+}
+function settleCard(trip) {
+  const rows = settleUp(trip);
+  return `<div class="h4"><b>${t("sp.settle")}</b></div><div class="list">${rows.length ? rows.map(([a, b, v]) =>
+    `<div class="li"><span class="fl">💸</span><div><strong>${esc(personName(trip, a))} → ${esc(personName(trip, b))}</strong></div><div class="amt">${fmtMoney(v, trip.cur)}</div></div>`).join("")
+    : `<div class="li"><span class="fl">🤝</span><div><strong>${t("sp.even")}</strong></div></div>`}</div>`;
+}
 /** Today / total / average per day, shown once above the expense list. */
 function summaryStrip(trip, tot, elapsed, days, td) {
   const running = (!trip.from || trip.from <= td) && (!trip.to || td <= trip.to);
-  const todaySum = tripExp(trip.id).filter(e => !e.personal && e.date === td).reduce((s, e) => s + e.homeAmount, 0);
+  const todaySum = tripExp(trip.id).filter(e => !e.personal && e.date === td).reduce((s, e) => s + myShare(e), 0);
   const cells = running ? [[t("t.today"), fmtAmt(todaySum)], [t("t.total"), fmtAmt(tot.total)], [t("t.avg"), fmtAmt(tot.total / elapsed)]]
     : [[t("t.total"), fmtAmt(tot.total)], [t("t.avg"), fmtAmt(tot.total / elapsed)], [t("t.days"), days ? fmtNum(days) : "–"]];
   return `<div class="strip">${cells.map(([l, v], i) => `<div><span>${l}</span><b>${v}${running || i < 2 ? ` <small>${trip.cur}</small>` : ""}</b></div>`).join("")}</div>`;
@@ -1417,6 +1534,7 @@ function openTripForm(trip) {
     <div class="two"><label class="field"><span>${t("v.from")}</span><input class="inp" type="date" id="tf" value="${trip?.from || today()}"></label>
     <label class="field"><span>${t("v.to")}</span><input class="inp" type="date" id="tt" value="${trip?.to || ""}"></label></div>
     <label class="field"><span>${t("t.budgetL", { cur: home })}</span><input class="inp" id="tb" inputmode="decimal" value="${trip?.budget ? String(trip.budget).replace(".", decSep()) : ""}"></label>
+    <label class="field"><span>${t("t.people")}</span><input class="inp" id="tp" placeholder="${esc(t("t.peoplePh"))}" value="${esc((trip?.people || []).map(p => p.name).join(", "))}"></label>
     <div class="actions"><button class="btn" id="tsave">${t("b.save")}</button>
     ${trip ? `<button class="btn danger" id="tdel">${t("t.del")}</button>` : ""}</div>`, "sheet");
   // Trip country: from the name ("Budapest", "Будимпешта" → Hungary), from GPS, or picked by hand.
@@ -1438,10 +1556,16 @@ function openTripForm(trip) {
   });
   $("#td", el).addEventListener("click", () => openList(code => { dest = code; auto = false; manual = true; drawDest(); }, t("t.pick")));
   $("#tf", el).addEventListener("change", e => { if ($("#tt", el).value && $("#tt", el).value < e.target.value) $("#tt", el).value = e.target.value; });
-  $("#tsave", el).addEventListener("click", () => {
+  $("#tsave", el).addEventListener("click", async () => {
     let from = $("#tf", el).value, to = $("#tt", el).value;
     if (from && to && to < from) [from, to] = [to, from];
-    const data = { name: $("#tn", el).value.trim() || t("t.defName"), from, to, budget: parseNum($("#tb", el).value) || 0 };
+    const people = readPeople($("#tp", el).value, trip);
+    const gone = (trip?.people || []).filter(p => !people.some(q => q.id === p.id)).map(p => p.id);
+    if (gone.length && tripExp(trip.id).some(e => gone.includes(e.paidBy) || e.split?.some(id => gone.includes(id)))) {
+      if (!await confirmBox(t("t.peopleQ"), t("b.ok"))) return;
+      for (const e of tripExp(trip.id)) dropPeople(e, gone);
+    }
+    const data = { name: $("#tn", el).value.trim() || t("t.defName"), from, to, budget: parseNum($("#tb", el).value) || 0, people };
     if (dest && (!trip || dest !== trip.country)) { data.country = dest; data.currency = META[dest][2] || (trip ? trip.cur : S.settings.home); }
     if (trip) Object.assign(trip, data);
     else {
@@ -1463,6 +1587,20 @@ function openTripForm(trip) {
     save(); closeLayer(); renderTrip(); refreshMap();
   });
 }
+/** "Ana, Marko" → [{id, name}], keeping the ids of names the trip already had. */
+function readPeople(text, trip) {
+  const seen = new Set();
+  return text.split(/[,;\n]/).map(n => n.trim()).filter(n => n && !seen.has(n.toLowerCase()) && seen.add(n.toLowerCase()))
+    .map(name => trip?.people?.find(p => p.name.toLowerCase() === name.toLowerCase()) || { id: uid(), name });
+}
+/** Takes removed companions out of an expense: their payments become mine, their shares go away. */
+function dropPeople(e, ids) {
+  if (ids.includes(e.paidBy)) delete e.paidBy;
+  if (e.split) {
+    e.split = e.split.filter(id => !ids.includes(id));
+    if (!e.split.length || (e.split.length === 1 && e.split[0] === ME)) delete e.split;
+  }
+}
 function tripMenu() {
   const trip = tripById(viewTripId) || tripById(S.settings.currentTrip);
   if (!trip) return;
@@ -1471,6 +1609,8 @@ function tripMenu() {
     <button class="li" data-m="edit"><span class="fl">✏️</span><div><strong>${t("t.edit")}</strong></div></button>
     ${isCur ? `<button class="li" data-m="end"><span class="fl">🏁</span><div><strong>${t("t.end")}</strong></div></button>` :
       `<button class="li" data-m="resume"><span class="fl">▶️</span><div><strong>${t("t.resume")}</strong></div></button>`}
+    <button class="li" data-m="cash"><span class="fl">💵</span><div><strong>${t("cash.title")}</strong></div></button>
+    ${tripExp(trip.id).length ? `<button class="li" data-m="csv"><span class="fl">📄</span><div><strong>${t("t.csv")}</strong></div></button>` : ""}
     </div>`, "sheet");
   el.addEventListener("click", e => {
     const m = e.target.closest("[data-m]")?.dataset.m;
@@ -1479,6 +1619,8 @@ function tripMenu() {
     if (m === "edit") openTripForm(trip);
     if (m === "end") { if (!trip.to || trip.to > today()) trip.to = today(); S.settings.currentTrip = null; viewTripId = trip.id; save(); renderTrip(); }
     if (m === "resume") { S.settings.currentTrip = trip.id; viewTripId = null; save(); renderTrip(); }
+    if (m === "cash") openCash(trip);
+    if (m === "csv") exportCsv([trip]);
   });
 }
 function setTripCountry(trip, code) {
@@ -1486,6 +1628,40 @@ function setTripCountry(trip, code) {
   trip.currency = META[code][2] || trip.cur;
   S.settings.lastCountry = code;
   save(); renderTrip();
+}
+
+function openCash(trip) {
+  let cur = trip.currency || trip.cur;
+  const el = pushLayer(`<div class="grab"></div><div class="stitle">💵 ${t("cash.title")}</div><div id="cs"></div>`, "sheet");
+  const draw = () => {
+    const left = Object.entries(cashLeft(trip));
+    const list = [...(trip.cash || [])].sort((a, b) => b.date.localeCompare(a.date));
+    $("#cs", el).innerHTML = `
+      ${left.length ? `<div class="strip" style="grid-template-columns:repeat(${Math.min(3, left.length)},1fr);margin-top:0">${left.map(([c, v]) =>
+        `<div><span>${t("cash.left")}</span><b style="${v < 0 ? "color:#E5484D" : ""}">${NF2.format(v)} <small>${c}</small></b></div>`).join("")}</div>` : ""}
+      <div class="field"><span>${t("cash.amount")}</span><div class="addrow" style="margin-top:0">
+        <input class="inp" id="ca" inputmode="decimal" placeholder="0"><button class="cur" id="cc">${cur} ▾</button><button class="btn" id="cadd">${t("cash.add")}</button></div></div>
+      <div class="note">${t("cash.hint")}</div>
+      ${list.length ? `<div class="list" style="margin-top:14px;box-shadow:none;background:var(--bg)">${list.map(c =>
+        `<div class="rate"><span>${esc(fmtDate(c.date, true))}</span><span style="margin-left:auto">${NF2.format(c.amount)} ${c.currency}</span><button class="x" style="margin-left:4px" data-del="${c.id}">×</button></div>`).join("")}</div>`
+        : `<div class="empty" style="padding:18px 0 4px">${t("cash.none")}</div>`}`;
+  };
+  draw();
+  el.addEventListener("click", e => {
+    if (e.target.closest("#cc")) pickCurrency(c => { cur = c; $("#cc", el).textContent = c + " ▾"; });
+    if (e.target.closest("#cadd")) {
+      const a = parseNum($("#ca", el).value);
+      if (!(a > 0)) return;
+      (trip.cash || (trip.cash = [])).push({ id: uid(), date: today(), currency: cur, amount: a });
+      save(); draw(); renderTrip();
+    }
+    const del = e.target.closest("[data-del]")?.dataset.del;
+    if (del) {
+      trip.cash = trip.cash.filter(c => c.id !== del);
+      if (!trip.cash.length) delete trip.cash;
+      save(); draw(); renderTrip();
+    }
+  });
 }
 
 /* Location: one reading when the trip tab opens; the country comes from the
@@ -1527,7 +1703,11 @@ function openExpense(id) {
     amt: old ? String(old.amount).replace(".", decSep()) : "",
     cat: old?.cat || null, pay: old?.pay || "card", personal: old?.personal || false, note: old?.note || "",
     homeOverride: old && old.manualHome ? String(old.homeAmount).replace(".", decSep()) : "", more: !!(old && (old.note || old.manualHome)),
+    paidBy: old?.paidBy || ME, split: old ? [...splitOf(old)] : null,
   };
+  const people = trip.people || [];
+  const everyone = [ME, ...people.map(p => p.id)];
+  if (!x.split) x.split = people.length ? everyone : [ME];
   const el = pushLayer(`<div class="grab"></div><div id="xs"></div>`, "tall");
   const amount = () => parseNum(x.amt);
   const rate = () => old && old.currency === x.currency && old.tripCur === trip.cur && !old.manualHome && old.rate ? old.rate : rateOf(x.currency, trip.cur);
@@ -1541,6 +1721,7 @@ function openExpense(id) {
     const a = amount(), r = rate(), hv = homeVal();
     let conv;
     if (x.currency === trip.cur) conv = `<span class="conv"><span>${t("e.homeAmt", { cur: trip.cur })}</span></span>`;
+    else if (!a && r) conv = `<button class="conv" data-x="more"><span>${rateLine(x.currency, trip.cur, "")}</span></button>`;
     else if (hv != null) conv = `<button class="conv" data-x="more">≈ ${fmtMoney(hv, trip.cur)}${r ? ` <span>· ${rateLine(x.currency, trip.cur, "")}</span>` : ""}</button>`;
     else conv = `<button class="conv warn" data-x="more">${esc(t("e.noRate", { cur: x.currency, home: trip.cur }))}</button>`;
     $("#xs", el).innerHTML = `
@@ -1553,6 +1734,8 @@ function openExpense(id) {
       <div class="grid">${CATS.map(([k, e]) => `<button class="${x.cat === k ? "on" : ""}" data-cat="${k}"><em>${e}</em>${t("cat." + k)}</button>`).join("")}</div>
       <div class="opts"><div class="mini"><button class="${x.pay === "card" ? "on" : ""}" data-pay="card">${t("e.card")}</button><button class="${x.pay === "cash" ? "on" : ""}" data-pay="cash">${t("e.cash")}</button></div>
         <button class="sw ${x.personal ? "on" : ""}" data-x="personal">${t("e.personal")}<i></i></button></div>
+      ${people.length ? `<button class="split" data-x="split">👥 ${esc(t("sp.btn", { who: personName(trip, x.paidBy),
+        list: x.split.length === everyone.length ? t("sp.all") : x.split.map(id => personName(trip, id)).join(", ") }))}</button>` : ""}
       ${x.more ? `<div class="more">
         ${x.currency !== trip.cur ? `<label class="field"><span>${t("e.homeAmt", { cur: trip.cur })} · ${t("e.homeHint")}</span><input class="inp" id="xh" inputmode="decimal" value="${esc(x.homeOverride)}" placeholder="${hv != null && !parseNum(x.homeOverride) ? esc(fmtAmt(hv)) : ""}"></label>` : ""}
         <label class="field"><span>${t("e.note")}</span><input class="inp" id="xn" value="${esc(x.note)}"></label></div>` :
@@ -1569,6 +1752,8 @@ function openExpense(id) {
     const hv = homeVal();
     $("#xsave", el).disabled = !(amount() > 0 && hv != null && x.country);
   };
+  // A personal purchase is usually just mine; anything else is shared by default.
+  const setPersonal = on => { x.personal = on; if (!old && people.length) x.split = on ? [ME] : everyone; };
   draw();
   el.addEventListener("click", async e => {
     const k = e.target.closest("[data-k]")?.dataset.k;
@@ -1584,11 +1769,12 @@ function openExpense(id) {
       draw(); return;
     }
     const cat = e.target.closest("[data-cat]")?.dataset.cat;
-    if (cat) { x.cat = cat; if (!old) x.personal = PERSONAL_CATS.has(cat); draw(); return; }
+    if (cat) { x.cat = cat; if (!old) setPersonal(PERSONAL_CATS.has(cat)); draw(); return; }
     const pay = e.target.closest("[data-pay]")?.dataset.pay;
     if (pay) { x.pay = pay; draw(); return; }
     const act = e.target.closest("[data-x]")?.dataset.x;
-    if (act === "personal") { x.personal = !x.personal; draw(); }
+    if (act === "personal") { setPersonal(!x.personal); draw(); }
+    if (act === "split") openSplit(trip, x, draw);
     if (act === "more") { x.more = true; draw(); }
     if (act === "country") openList(code => { x.country = code; x.currency = META[code][2] || x.currency; x.homeOverride = ""; draw(); }, t("t.pick"));
     if (act === "cur") pickCurrency(c => { x.currency = c; x.homeOverride = ""; draw(); });
@@ -1606,7 +1792,12 @@ function openExpense(id) {
         tripId: trip.id, date: x.date, country: x.country, currency: x.currency, amount: a,
         rate: manualHome ? hv / a : (x.currency === trip.cur ? 1 : rate()), tripCur: trip.cur,
         homeAmount: Math.round(hv * 100) / 100, manualHome, cat: x.cat || "other", pay: x.pay, personal: x.personal, note: x.note.trim(),
+        paidBy: people.length && x.paidBy !== ME ? x.paidBy : undefined,
+        split: people.length && !(x.split.length === 1 && x.split[0] === ME) ? x.split : undefined,
       };
+      if (!rec.paidBy) delete rec.paidBy;
+      if (!rec.split) delete rec.split;
+      if (old) { delete old.paidBy; delete old.split; }
       if (old) Object.assign(old, rec);
       else S.expenses.push({ id: uid(), t: Date.now(), ...rec });
       if (trip.id === S.settings.currentTrip && x.date === today() && trip.country !== x.country) {
@@ -1616,6 +1807,31 @@ function openExpense(id) {
       syncTripVisits(trip.id);
       save(); closeLayer(); renderTrip(); refreshMap();
     }
+  });
+}
+
+/** Who paid and who shares an expense; edits x in place. */
+function openSplit(trip, x, redraw) {
+  const ids = [ME, ...trip.people.map(p => p.id)];
+  const el = pushLayer(`<div class="grab"></div><div class="stitle">👥 ${t("sp.title")}</div><div id="ss"></div>
+    <div class="actions"><button class="btn" data-ok>${t("b.ok")}</button></div>`, "sheet", redraw);
+  const draw = () => {
+    const chips = (key, on) => `<div class="chipset">${ids.map(id => `<button class="chip ${on(id) ? "on" : ""}" data-${key}="${id}">${esc(personName(trip, id))}</button>`).join("")}</div>`;
+    $("#ss", el).innerHTML = `<div class="field"><span>${t("sp.paid")}</span>${chips("by", id => x.paidBy === id)}</div>
+      <div class="field" style="margin-top:16px"><span>${t("sp.among")}</span>${chips("in", id => x.split.includes(id))}</div>
+      <div class="note">${t("sp.hint")}</div>`;
+  };
+  draw();
+  el.addEventListener("click", e => {
+    const by = e.target.closest("[data-by]")?.dataset.by;
+    if (by) { x.paidBy = by; draw(); return; }
+    const inn = e.target.closest("[data-in]")?.dataset.in;
+    if (inn) {
+      if (!x.split.includes(inn)) x.split = ids.filter(id => id === inn || x.split.includes(id));
+      else if (x.split.length > 1) x.split = x.split.filter(id => id !== inn);
+      draw(); return;
+    }
+    if (e.target.closest("[data-ok]")) closeLayer();
   });
 }
 
@@ -1664,13 +1880,61 @@ function renderStats() {
           <circle cx="27" cy="27" r="22" fill="none" stroke="var(--v3)" stroke-width="6" stroke-linecap="round" stroke-dasharray="${(C * p / 100).toFixed(1)} ${C.toFixed(1)}" transform="rotate(-90 27 27)" ${p ? "" : 'stroke-opacity="0"'}/>
           <text x="27" y="31.5" text-anchor="middle">${Math.round(p)}%</text></svg>${t("r." + k)}</div>`;
       }).join("")}</div>
+      <div class="list" style="margin-top:10px">
+        <button class="li" data-act="timeline"><span class="fl">📅</span><div><strong>${t("s.timeline")}</strong><span>${t("s.timelineSub")}</span></div><span class="go muted">›</span></button>
+        ${trips.filter(tr => tripExp(tr.id).length).length > 1 ? `<button class="li" data-act="compare"><span class="fl">⚖️</span><div><strong>${t("s.compare")}</strong><span>${t("s.compareSub")}</span></div><span class="go muted">›</span></button>` : ""}
+      </div>
       <div class="h4"><b>${t("s.trips")}</b></div>
       ${trips.length ? tripList(trips) : `<div class="empty">${t("s.noTrips")}</div>`}
     </div>`;
 }
+function openPage(title, body) {
+  const el = pushLayer(`<header class="top"><button class="iconbtn" data-close><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+    <div class="h1" style="flex:1;font-size:22px">${esc(title)}</div></header><div class="scroll pad">${body}</div>`, "page");
+  $("[data-close]", el).addEventListener("click", () => closeLayer());
+  el.addEventListener("click", e => { const c = e.target.closest("[data-country]"); if (c) openCountry(c.dataset.country); });
+  return el;
+}
+/** Every dated visit grouped by year, newest first; countries without dates at the end. */
+function openTimeline() {
+  const years = {}, first = {}, undated = [];
+  for (const [code, c] of Object.entries(S.countries)) {
+    const dated = (c.visits || []).filter(v => v.from);
+    for (const v of dated) (years[v.from.slice(0, 4)] || (years[v.from.slice(0, 4)] = [])).push({ code, v });
+    if (dated.length) first[code] = dated.map(v => v.from).sort()[0].slice(0, 4);
+    else if (isVisited(code)) undated.push(code);
+  }
+  const row = (code, sub) => `<button class="li" data-country="${code}"><span class="fl">${flag(code)}</span><div><strong>${esc(cname(code))}</strong><span>${esc(sub)}</span></div><span class="go muted">›</span></button>`;
+  const body = Object.keys(years).sort().reverse().map(y => {
+    const list = years[y].sort((a, b) => b.v.from.localeCompare(a.v.from));
+    const countries = new Set(list.map(x => x.code)), fresh = [...countries].filter(c => first[c] === y).length;
+    return `<div class="yr"><b>${y}</b><span>${tn("pl.countries", countries.size)}${fresh ? " · " + tn("pl.new", fresh) : ""}</span></div>
+      <div class="list">${list.map(({ code, v }) => row(code, [v.place || tripById(v.tripId)?.name, fmtRange(v.from, v.to)].filter(Boolean).join(" · "))).join("")}</div>`;
+  }).join("") + (undated.length ? `<div class="yr"><b>${t("s.undated")}</b><span>${tn("pl.countries", undated.length)}</span></div>
+      <div class="list">${undated.sort((a, b) => cname(a).localeCompare(cname(b))).map(c => row(c, t("st." + S.countries[c].status))).join("")}</div>` : "");
+  openPage(t("s.timeline"), body || `<div class="empty">${t("c.noVisits")}</div>`);
+}
+/** Trips side by side: average per day in the home currency and the biggest categories. */
+function openCompare() {
+  const home = S.settings.home;
+  const list = S.trips.filter(tr => tripExp(tr.id).length).map(tr => {
+    const tot = tripTotals(tr), r = rateOf(tr.cur, home), cur = r ? home : tr.cur, k = r || 1;
+    return { tr, tot, cur, total: tot.total * k, avg: tot.total * k / tripElapsed(tr), days: tripElapsed(tr) };
+  }).sort((a, b) => b.avg - a.avg);
+  const max = Math.max(...list.filter(x => x.cur === home).map(x => x.avg), 1);
+  openPage(t("s.compare"), list.map(({ tr, tot, cur, total, avg, days }) => {
+    const cats = Object.entries(tot.byCat).sort((a, b) => b[1] - a[1]).slice(0, 4);
+    const cc = tripCountries(tr);
+    return `<div class="card cmp"><button class="li" data-act="openTrip" data-v="${tr.id}"><span class="fl">${cc.length ? cc.slice(0, 3).map(flag).join("") : "🧳"}</span>
+        <div><strong>${esc(tr.name)}</strong><span>${tn("pl.days", days)} · ${fmtMoney(total, cur)}</span></div>
+        <div class="amt">${fmtAmt(avg)}<span class="muted">${esc(t("s.perDay", { cur }))}</span></div></button>
+      <div class="t"><i style="width:${cur === home ? (avg / max * 100).toFixed(1) : 0}%"></i></div>
+      <div class="catleg">${cats.map(([c, v]) => `<span><i style="background:${CAT[c].c}"></i>${t("cat." + c)} ${Math.round(v / tot.total * 100)}%</span>`).join("")}</div></div>`;
+  }).join(""));
+}
 function compact(n) {
   if (n < 1e6) return fmtNum(n);
-  try { return new Intl.NumberFormat(LOCALES[LANG], { notation: "compact", maximumFractionDigits: n >= 1e6 ? 1 : 0 }).format(n); }
+  try { return new Intl.NumberFormat(LOCALES[LANG], { notation: "compact", maximumFractionDigits: 1 }).format(n); }
   catch (e) { return fmtNum(n); }
 }
 
@@ -1817,6 +2081,7 @@ function renderSettings() {
     <div class="group"><div class="lbl">${t("g.data")}</div><div class="card" style="padding:2px 16px">
       <button class="set" data-g="export">${t("g.export")}<span class="val">${s.lastBackup ? esc(fmtDate(iso(new Date(s.lastBackup)), true)) : ""}</span></button>
       <button class="set" data-g="import">${t("g.import")}</button>
+      ${S.expenses.length ? `<button class="set" data-g="csv">${t("g.csv")}</button>` : ""}
       <button class="set" data-g="wipe" style="color:#E5484D">${t("g.wipe")}</button>
     </div></div>
     <div class="group"><div class="lbl">${t("g.about")}</div><div class="card" style="padding:2px 16px">
@@ -1863,6 +2128,7 @@ function onSettingsClick(e) {
   if (g === "delRate") { delete S.settings.manual[e.target.closest("[data-g]").dataset.v]; save(); renderSettings(); }
   if (g === "export") exportData();
   if (g === "import") $("#importFile").click();
+  if (g === "csv") exportCsv(S.trips);
   if (g === "wipe") wipe();
   if (g === "update") AND.checkForUpdate();
 }
@@ -1875,6 +2141,29 @@ function exportData() {
   save();
   if (curTab === "stats") renderStats();
   refreshOpenSettings();
+}
+/** Expenses as a spreadsheet: ";" and the local decimal comma, as Excel expects in Europe. */
+function exportCsv(trips) {
+  const num = n => String(Math.round(n * 1e4) / 1e4).replace(".", decSep());
+  const cell = v => { v = String(v ?? ""); return /[";\n]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v; };
+  const curs = [...new Set(trips.map(tr => tr.cur))];
+  const rows = [t("csv.head", { cur: curs.length === 1 ? curs[0] : "" }).replace(/ \(\)/g, "").split("|")];
+  for (const tr of [...trips].sort((a, b) => (a.from || "").localeCompare(b.from || ""))) {
+    for (const e of tripExp(tr.id).sort((a, b) => a.date.localeCompare(b.date) || (a.t || 0) - (b.t || 0))) {
+      rows.push([tr.name, e.date, cname(e.country), t("cat." + e.cat), e.note, num(e.amount), e.currency, num(e.rate || 0),
+        num(e.homeAmount) + (curs.length > 1 ? " " + tr.cur : ""), num(myShare(e)) + (curs.length > 1 ? " " + tr.cur : ""),
+        e.pay ? t(e.pay === "cash" ? "e.cash" : "e.card") : "", e.personal ? t("b.yesNo") : "",
+        e.paidBy || e.split ? personName(tr, e.paidBy) : "", e.split ? e.split.map(id => personName(tr, id)).join(", ") : ""]);
+    }
+  }
+  const text = "\ufeff" + rows.map(r => r.map(cell).join(";")).join("\r\n");
+  const name = `globetint-${trips.length === 1 ? plain(trips[0].name).replace(/ /g, "-") || "trip" : "expenses"}-${today()}.csv`;
+  if (AND?.saveBase64) {
+    const bytes = new TextEncoder().encode(text);
+    let bin = "";
+    for (let i = 0; i < bytes.length; i += 8192) bin += String.fromCharCode(...bytes.subarray(i, i + 8192));
+    AND.saveBase64(name, "text/csv", btoa(bin));
+  } else { download(URL.createObjectURL(new Blob([text], { type: "text/csv" })), name); toast(t("x.csvSaved")); }
 }
 $("#importFile").addEventListener("change", async e => {
   const f = e.target.files[0];
@@ -1912,7 +2201,7 @@ const ACTIONS = {
   editVisit: (v, el) => openVisit(el.dataset.c, v),
   newTrip: () => openTripForm(),
   tripMenu: () => tripMenu(),
-  openTrip: v => { viewTripId = v === S.settings.currentTrip ? null : v; showTab("trip"); $("#tripView").scrollTop = 0; },
+  openTrip: v => { while (stack.length) closeLayer(); viewTripId = v === S.settings.currentTrip ? null : v; showTab("trip"); $("#tripView").scrollTop = 0; },
   closeTripView: () => { viewTripId = null; renderTrip(); },
   addExpense: () => openExpense(),
   editExpense: v => openExpense(v),
@@ -1920,6 +2209,9 @@ const ACTIONS = {
   gpsSwitch: () => { const tr = tripById(S.settings.currentTrip); if (tr && gpsSuggest) setTripCountry(tr, gpsSuggest); },
   share: () => openShare(),
   exportData: () => exportData(),
+  timeline: () => openTimeline(),
+  compare: () => openCompare(),
+  openCash: () => { const tr = tripById(viewTripId) || tripById(S.settings.currentTrip); if (tr) openCash(tr); },
 };
 document.addEventListener("click", e => {
   const el = e.target.closest("[data-act]");
