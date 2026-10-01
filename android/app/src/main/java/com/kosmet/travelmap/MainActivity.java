@@ -362,11 +362,12 @@ public class MainActivity extends Activity {
             runOnUiThread(() -> saveBytes(name, "application/json", data, Strings.get(MainActivity.this, "backupSaved")));
         }
 
-        /** Saves binary data (the map image) passed as base64. */
+        /** Saves binary data passed as base64 (the map image, a CSV export). */
         @JavascriptInterface
         public void saveBase64(final String name, final String mime, final String base64) {
             final byte[] data = Base64.decode(base64, Base64.DEFAULT);
-            runOnUiThread(() -> saveBytes(name, mime, data, Strings.get(MainActivity.this, "imageSaved")));
+            final String done = mime.startsWith("image/") ? "imageSaved" : "fileSaved";
+            runOnUiThread(() -> saveBytes(name, mime, data, Strings.get(MainActivity.this, done)));
         }
 
         /** Shares a PNG (base64) through Android's share sheet. */
