@@ -283,6 +283,14 @@ textarea.inp{height:76px;padding:12px 14px;resize:none}
 
 .shareimg{width:100%;border-radius:18px;display:block;margin:4px 0 14px;box-shadow:var(--shadow)}
 
+/* quick converter (trip tab) */
+.convrow{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:12px;background:var(--card);box-shadow:var(--shadow);border-radius:18px;padding:8px 16px 8px 8px;margin-top:8px}
+.convin{display:flex;align-items:center;gap:6px;background:var(--bg);border:1.5px solid var(--line);border-radius:14px;height:46px;padding:0 5px 0 12px;min-width:0}
+.convin:focus-within{border-color:var(--accent)}
+.convin input{flex:1;min-width:0;width:100%;border:0;background:none;outline:none;font-size:17px;font-weight:700}
+.convin button{background:var(--chip);border-radius:10px;padding:7px 10px;font-size:13px;font-weight:800;flex:none}
+.convrow b{font-size:17px;font-weight:800;color:var(--accent);white-space:nowrap;text-align:right}
+
 /* companions, cash, timeline, comparison */
 .chipset{display:flex;flex-wrap:wrap;gap:8px}
 .chipset .chip{font-size:14px;padding:9px 16px}
@@ -1372,6 +1380,7 @@ function renderTrip() {
       </div>
       ${isCur && gpsSuggest && gpsSuggest !== here ? `<button class="banner" data-act="gpsSwitch"><span class="flag">📍</span><div>${esc(t("t.here", { c: cname(gpsSuggest) }))}<span>${META[gpsSuggest][2]}${rateLine(META[gpsSuggest][2], trip.cur, " · ")}</span></div><b>${t("t.switch")}</b></button>` : ""}
       ${isCur ? `<button class="banner" data-act="pickHere"><span class="flag">${here ? flag(here) : "🌍"}</span><div>${here ? esc(t("t.now", { c: cname(here) })) : t("t.pick")}<span>${here ? trip.currency || META[here][2] : ""}${here ? rateLine(trip.currency || META[here][2], trip.cur, " · ") : ""}</span></div><span class="go muted" style="font-size:20px">›</span></button>` : ""}
+      ${isCur && here ? converterRow(trip.currency || META[here][2], trip.cur) : ""}
       ${exps.length ? summaryStrip(trip, tot, elapsed, days, td) : ""}
       ${trip.cash?.length ? `<button class="banner" data-act="openCash"><span class="flag">💵</span><div>${t("cash.title")}<span>${esc(fmtCash(cashLeft(trip)))}</span></div><span class="go muted" style="font-size:20px">›</span></button>` : ""}
       ${hasShared(trip) ? settleCard(trip) : ""}
@@ -1387,6 +1396,18 @@ function renderTrip() {
       }).join("") : `<div class="empty">${t("t.noExp")}</div>`}
       ${!viewTripId && past.length ? `<div class="h4"><b>${t("t.past")}</b></div>${tripList(past)}` : ""}
     </div>`;
+}
+/* Quick converter: what a price in the local currency costs at home, or the other way round. */
+let convAmt = "", convRev = false;
+function converterRow(local, home) {
+  if (!local || local === home || !rateOf(local, home)) return "";
+  const from = convRev ? home : local;
+  return `<div class="convrow"><div class="convin"><input id="cvi" inputmode="decimal" placeholder="0" autocomplete="off" value="${esc(convAmt)}">
+    <button data-act="convSwap" data-v="${local}|${home}">${from} ⇄</button></div><b id="cvo">${convResult(local, home)}</b></div>`;
+}
+function convResult(local, home) {
+  const [from, to] = convRev ? [home, local] : [local, home];
+  return "≈ " + fmtMoney(parseNum(convAmt) * rateOf(from, to), to);
 }
 /** Payment, and for a shared expense who paid and between how many. */
 function expDetail(trip, e) {
@@ -2203,6 +2224,7 @@ const ACTIONS = {
   tripMenu: () => tripMenu(),
   openTrip: v => { while (stack.length) closeLayer(); viewTripId = v === S.settings.currentTrip ? null : v; showTab("trip"); $("#tripView").scrollTop = 0; },
   closeTripView: () => { viewTripId = null; renderTrip(); },
+  convSwap: v => { convRev = !convRev; renderTrip(); $("#cvi")?.focus(); },
   addExpense: () => openExpense(),
   editExpense: v => openExpense(v),
   pickHere: () => { const tr = tripById(S.settings.currentTrip); if (tr) openList(code => setTripCountry(tr, code), t("t.pick")); },
@@ -2213,6 +2235,12 @@ const ACTIONS = {
   compare: () => openCompare(),
   openCash: () => { const tr = tripById(viewTripId) || tripById(S.settings.currentTrip); if (tr) openCash(tr); },
 };
+document.addEventListener("input", e => {
+  if (e.target.id !== "cvi") return;
+  convAmt = e.target.value;
+  const [local, home] = $("[data-act=convSwap]").dataset.v.split("|");
+  $("#cvo").textContent = convResult(local, home);
+});
 document.addEventListener("click", e => {
   const el = e.target.closest("[data-act]");
   if (!el) return;
